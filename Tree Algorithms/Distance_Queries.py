@@ -1,0 +1,121 @@
+import sys,math,random
+from heapq import heappush,heappop
+from bisect import bisect_right,bisect_left
+from collections import Counter,deque,defaultdict
+from itertools import permutations
+
+# functions #
+MOD = 998244353
+MOD = 10**9 + 7
+RANDOM = random.randrange(2**62)
+def gcd(a,b):
+    if a%b==0:
+        return b
+    else:
+        return gcd(b,a%b)
+def lcm(a,b):
+    return a//gcd(a,b)*b
+def w(x):
+    return x ^ RANDOM
+##
+
+#String hashing : sh, fenwick sortedlist : fsortl, Number : numtheory, SparseTable : SparseTable
+#bucket sorted list : bsortl, segment tree(lazy propogation) : SegmentTree,Other, bootstrap : bootstrap
+#binary indexed tree : BIT, segment tree(point updates) : SegmentPoint, Convex Hull : hull
+#Combinatorics : pnc, Diophantine Equations : dpheq, Graphs : graphs, DSU : DSU
+#Template : https://github.com/OmAmar106/Template-for-Competetive-Programming
+
+def bellman_ford(n, edges, start):
+    dist = [float("inf")] * n
+    pred = [None] * n
+    dist[start] = 0
+    for _ in range(n):
+        for u, v, d in edges:
+            if dist[u] + d < dist[v]:
+                dist[v] = dist[u] + d
+                pred[v] = u
+    # for u, v, d in edges:
+    #	 if dist[u] + d < dist[v]:
+    #		 return -1
+    # This returns -1 , if there is a negative cycle
+
+class binary_lift:
+    def __init__(self, graph, data=(), f=min, root=0):
+        n = len(graph)
+        parent = [-1] * (n + 1)
+        depth = self.depth = [-1] * n
+        bfs = [root]
+        depth[root] = 0
+        for node in bfs:
+            for nei in graph[node]:
+                if depth[nei] == -1:
+                    parent[nei] = node
+                    depth[nei] = depth[node] + 1
+                    bfs.append(nei)
+
+        data = self.data = [data]
+        parent = self.parent = [parent]
+        self.f = f
+
+        for _ in range(max(depth).bit_length()):
+            old_data = data[-1]
+            old_parent = parent[-1]
+            data.append([f(val, old_data[p]) for val,p in zip(old_data, old_parent)])
+            parent.append([old_parent[p] for p in old_parent])
+
+    def lca(self, a, b):
+        depth = self.depth
+        parent = self.parent
+        if depth[a] < depth[b]:
+            a,b = b,a
+        d = depth[a] - depth[b]
+        for i in range(d.bit_length()):
+            if (d >> i) & 1:
+                a = parent[i][a]
+        for i in range(depth[a].bit_length())[::-1]:
+            if parent[i][a] != parent[i][b]:
+                a = parent[i][a]
+                b = parent[i][b]
+        if a != b:
+            return parent[0][a]
+        else:
+            return a
+    def distance(self, a, b):
+        return self.depth[a] + self.depth[b] - 2 * self.depth[self.lca(a,b)]
+    def kth_ancestor(self, a, k):
+        parent = self.parent
+        if self.depth[a] < k:
+            return -1
+        for i in range(k.bit_length()):
+            if (k >> i) & 1:
+                a = parent[i][a]
+        return a
+    def __call__(self, a, b):
+        depth = self.depth
+        parent = self.parent
+        data = self.data
+        f = self.f
+        c = self.lca(a, b)
+        val = data[0][c]
+        for x,d in (a, depth[a] - depth[c]), (b, depth[b] - depth[c]):
+            for i in range(d.bit_length()):
+                if (d >> i) & 1:
+                    val = f(val, data[i][x])
+                    x = parent[i][x]
+        return val
+    
+def solve():
+    n,q = list(map(int, sys.stdin.readline().split()))
+    d = {}
+    for i in range(n):
+        d[i] = []
+    for i in range(n-1):
+        L = list(map(int, sys.stdin.readline().split()))
+        d[L[0]-1].append(L[1]-1)
+        d[L[1]-1].append(L[0]-1)
+    bl = binary_lift(d)
+    for i in range(q):
+        u,v = list(map(int, sys.stdin.readline().split()))
+        print(bl.distance(u-1,v-1))
+    #st = sys.stdin.readline().strip()
+solve()
