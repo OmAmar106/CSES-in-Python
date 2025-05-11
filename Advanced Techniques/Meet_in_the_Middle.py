@@ -1,13 +1,54 @@
-import sys,math,random
+import sys,math,cmath,random,os
 from heapq import heappush,heappop
 from bisect import bisect_right,bisect_left
 from collections import Counter,deque,defaultdict
 from itertools import permutations
+from io import BytesIO, IOBase
+
+BUFSIZE = 8192
+class FastIO(IOBase):
+    newlines = 0
+    def __init__(self, file):
+        self._file = file
+        self._fd = file.fileno()
+        self.buffer = BytesIO()
+        self.writable = "x" in file.mode or "r" not in file.mode
+        self.write = self.buffer.write if self.writable else None
+    def read(self):
+        while True:
+            b = os.read(self._fd, max(os.fstat(self._fd).st_size, BUFSIZE))
+            if not b:
+                break
+            ptr = self.buffer.tell()
+            self.buffer.seek(0, 2), self.buffer.write(b), self.buffer.seek(ptr)
+        self.newlines = 0
+        return self.buffer.read()
+    def readline(self):
+        while self.newlines == 0:
+            b = os.read(self._fd, max(os.fstat(self._fd).st_size, BUFSIZE))
+            self.newlines = b.count(b"\n") + (not b)
+            ptr = self.buffer.tell()
+            self.buffer.seek(0, 2), self.buffer.write(b), self.buffer.seek(ptr)
+        self.newlines -= 1
+        return self.buffer.readline()
+    def flush(self):
+        if self.writable:
+            os.write(self._fd, self.buffer.getvalue())
+            self.buffer.truncate(0), self.buffer.seek(0)
+class IOWrapper(IOBase):
+    def __init__(self, file):
+        self.buffer = FastIO(file)
+        self.flush = self.buffer.flush
+        self.writable = self.buffer.writable
+        self.write = lambda s: self.buffer.write(s.encode("ascii"))
+        self.read = lambda: self.buffer.read().decode("ascii")
+        self.readline = lambda: self.buffer.readline().decode("ascii")
+sys.stdin, sys.stdout = IOWrapper(sys.stdin), IOWrapper(sys.stdout)
 
 # functions #
-MOD = 998244353
+# MOD = 998244353
 MOD = 10**9 + 7
-RANDOM = random.randrange(2**62)
+RANDOM = random.randrange(1,2**62)
 def gcd(a,b):
     if a%b==0:
         return b
@@ -16,92 +57,35 @@ def gcd(a,b):
 def lcm(a,b):
     return a//gcd(a,b)*b
 def w(x):
-    return (x)
+    return x ^ RANDOM
 ##
 
-#String hashing : sh/shclass, fenwick sortedlist : fsortl, Number : numtheory, SparseTable : SparseTable
-#bucket sorted list : bsortl, segment tree(lazy propogation) : SegmentTree,Other, bootstrap : bootstrap
-#binary indexed tree : BIT, segment tree(point updates) : SegmentPoint, Convex Hull : hull
-#Combinatorics : pnc, Diophantine Equations : dpheq, Graphs : graphs, DSU : DSU, Geometry: Geometry
+#String hashing: sh/shclass, fenwick sortedlist: fsortl, Number: numtheory, SparseTable: SparseTable
+#Bucket Sorted list: bsortl, Segment Tree(lazy propogation): SegmentTree/Other, bootstrap: bootstrap
+#binary indexed tree: BIT, Segment Tree(point updates): SegmentPoint, Convex Hull: hull, Trie: Tries
+#Combinatorics: pnc, Diophantine Equations: dpheq, Graphs: graphs, DSU: DSU, Geometry: Geometry, FFT: fft
+#Persistent Segment Tree: perseg, FreqGraphs: bgraph, Binary Trie: b_trie, XOR_dict: xdict, HLD: hld
 #Template : https://github.com/OmAmar106/Template-for-Competetive-Programming
+# input_file = open(r'input.txt', 'r');sys.stdin = input_file
 
-from types import GeneratorType
-
-def bootstrap(f, stack=[]):
-    def wrappedfunc(*args, **kwargs):
-        if stack:
-            return f(*args, **kwargs)
-        else:
-            to = f(*args, **kwargs)
-            while True:
-                if type(to) is GeneratorType:
-                    stack.append(to)
-                    to = next(to)
-                else:
-                    stack.pop()
-                    if not stack:
-                        break
-                    to = stack[-1].send(to)
-            return to
-    return wrappedfunc
-
-# @bootstrap
-# put this just on top of recursion function to increase the recursion limit
-
-# rather than return now use yield and when function being called inside itself, use yield before the function name
-# example usage:
-# @bootstrap
-# def rec1(L,k,cur,count):
-# 	if count>=100000:
-# 		yield float('INF')
-# 	if cur+k+1>=len(L)-1:
-# 		yield L[cur]+2
-# 	if cur in d:
-# 		yield d[cur]
-# 	ans = float('INF')
-# 	mini = float('INF')
-# 	for i in range(k+1,0,-1):
-# 		if L[cur+i]<mini:
-# 			ans = min(ans,1+L[cur]+(yield rec1(L,k,cur+i,count+1)))
-# 			mini = L[cur+i]
-# 	d[cur] = ans
-# 	yield ans
-# the limit of recursion on cf is 10**6
+def func(L):
+    dp = [0]*(1<<len(L))
+    for i in range(1,1<<len(L)):
+        x = i.bit_length()
+        dp[i] += L[x-1]+dp[i^(1<<(x-1))]
+    return Counter(dp)
 
 def solve():
-
-    # this technique is called meet in the middle , in this 
-    # you divide it into two different subsets , it is reall
-    # similar to how we check if a sum exists in O(n)
-
     n,x = list(map(int, sys.stdin.readline().split()))
     L = list(map(int, sys.stdin.readline().split()))
-    d = Counter()
-    d1 = Counter()    
-
-    def rec():
-        d2 = {}
-        d2[0] = 1
-        for i in range(len(L)):
-            d3 = Counter()
-            for j in d2:
-                d3[j+L[i]] += d2[j]
-            for j in d3:
-                d2[j] = d2.get(j,0)+d3[j]
-        for i in d2:
-            d[i] += d2[i]
     
-    L1 = L[:]
-    L = L1[:n//2]
-    rec()
-    L = L1[n//2:]
-    d1 = dict(d)
-    d.clear()
-    rec()
+    d = func(L[:n//2])
+    d1 = func(L[n//2:])
     ans = 0
-    for i in d1:
-        ans += (d1[i]*d[(x-(i))])
+    for i in d:
+        ans += d[i]*(d1[x-i])
     
     print(ans)
+    #L1 = list(map(int, sys.stdin.readline().split()))
     #st = sys.stdin.readline().strip()
 solve()

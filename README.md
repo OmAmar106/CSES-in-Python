@@ -24,6 +24,7 @@ Welcome to my repository where I am solving all the **CSES Problem Set** problem
 18. **Additional Problems II**
 
 I'll be updating this repo as soon as i complete more problems. There are a total of 400 problems.
+There might be some problems in which, you might need to use Python3 rather than PyPy.
 
 ## 🏅 Acknowledgements
 
@@ -31,3 +32,4 @@ Thanks to the **CSES Problem Set** creators for providing such an amazing platfo
 
 Problem Set Link : https://cses.fi/problemset/list/
 
+CSES ID : https://cses.fi/user/285799
