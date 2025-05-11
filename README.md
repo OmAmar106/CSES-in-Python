@@ -9,12 +9,21 @@ Welcome to my repository where I am solving all the **CSES Problem Set** problem
 3. **Dynamic Programming**
 4. **Graph Algorithms**
 5. **Range Queries**
-6. **Mathematics**
-7. **String Algorithms**
-8. **Geometry**
-9. **Advanced Techniques**
+6. **Tree Algorithms**
+7. **Mathematics**
+8. **String Algorithms**
+9. **Geometry**
+10. **Advanced Techniques**
+11. **Sliding Window Problems**
+12. **Interactive Problems**
+13. **Bitwise Operations**
+14. **Construction Problems**
+15. **Advanced Graph Problems**
+16. **Counting Problems**
+17. **Additional Problems I**
+18. **Additional Problems II**
 
-I'll be updating this repo as soon as i complete more problems.
+I'll be updating this repo as soon as i complete more problems. There are a total of 400 problems.
 
 ## 🏅 Acknowledgements
 
