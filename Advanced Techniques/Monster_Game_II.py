@@ -30,7 +30,7 @@ INF = float('inf')
 class Line:
     def __init__(self, m, b):
         self.m = m
-        self.c = b
+        self.b = b
     def __call__(self, x):
         return self.m * x + self.b
 class ConvexHull:
@@ -92,14 +92,16 @@ class CHT:
         self.t = tp
         self.ptr = 0
         self.v = []
-    def bad(self,l1, l2, l3):
-        return (l2.c - l1.c) * (l2.m - l3.m) >= (l3.c - l2.c) * (l1.m - l2.m)
-
+    def bad(self, l1, l2, l3):
+        a = (l3.c - l1.c) * (l1.m - l2.m)
+        b = (l2.c - l1.c) * (l1.m - l3.m)
+        if self.t in [1, 4]:
+            return a <= b
+        return a >= b
     def add(self, line):
         self.v.append(line)
         while len(self.v) >= 3 and self.bad(self.v[-3], self.v[-2], self.v[-1]):
             self.v.pop(-2)
-
     def val(self, ind, x):
         return self.v[ind].m * x + self.v[ind].c
     def query(self, x):
@@ -140,17 +142,17 @@ class CHT:
                     self.ptr += 1
                 else:
                     break
-        return self.val(self.ptr, x) 
- 
+        return self.val(self.ptr, x)
+    
 def solve():
     n,q = list(map(int, sys.stdin.readline().split()))
     a = list(map(int, sys.stdin.readline().split()))
     b = list(map(int, sys.stdin.readline().split()))
-    cx = CHT(1)
-    cx.add(Line(q,0))
+    cx = ConvexHull()
+    cx.insert(Line(q,0))
     for i in range(len(a)):
-        ans = cx.query2(a[i])
-        cx.add(Line(b[i],ans))
+        ans = cx.query(a[i])
+        cx.insert(Line(b[i],ans))
     print(ans)
     #st = sys.stdin.readline().strip()
 solve()
