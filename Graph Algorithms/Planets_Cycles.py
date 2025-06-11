@@ -79,27 +79,61 @@ MATI = lambda x : [list(map(int, sys.stdin.readline().split())) for _ in range(x
 # input_file = open(r'input.txt', 'r');sys.stdin = input_file
 
 def solve():
-    n,q = LII()
-    L1 = LII_1()
+    n = II()
+    L = LII()
 
-    X = 30
-    parent = [L1]
-    for i in range(X-1):
-        parent.append([L1[L1[j]] for j in range(n)])
-        L1 = parent[-1]
+    X = math.ceil(math.log(n,2))+1
 
-    # for i in range(1,X):
-    #     for j in range(n):
-    #         parent[j][i] = parent[parent[j][i-1]][i-1]
- 
-    for _ in range(q):
-        a,k = list(map(int, sys.stdin.readline().split()))
-        a -= 1
-        # print(a,k)
-        for i in range(k.bit_length()):
-            if k&(1<<i):
-                # print(i)
-                a = parent[i][a]
-        print(a+1)
+    parent = [[0]*X for i in range(n)]
+    for i in range(n):
+        parent[i][0] = i
+        parent[i][1] = L[i]-1
 
+    for i in range(2,X):
+        for j in range(n):
+            parent[j][i] = parent[parent[j][i-1]][i-1]
+
+    size = [-1] * n
+
+
+    cycle = [0] * n
+    q = deque()
+    for i in range(n):
+        if cycle[i]==0:
+            path = []
+            curr = i
+            while cycle[curr]==0:
+                cycle[curr] = 1
+                path.append(curr)
+                curr = L[curr]-1
+            if cycle[curr]==1:
+                cycle_start_index = path.index(curr)
+                cycle_length = len(path)-cycle_start_index
+                for j in range(cycle_start_index,len(path)):
+                    k = path[j]
+                    size[k] = cycle_length
+                    cycle[k] = 2
+                    q.append((k,0))
+            for j in range(len(path)-1,-1,-1):
+                node = path[j]
+                if cycle[node]==1:
+                    size[node] = size[L[node]-1]+1
+                    cycle[node] = 2
+    # print(cycle)
+
+    for i in range(n):
+        if cycle[i]==2:
+            print(size[i],end=' ')
+            continue
+        ans = 0
+        x2 = i
+        for j in range(X-1,-1,-1):
+            if cycle[(parent[x2][j])]==2:
+                continue
+            else:
+                x2 = parent[x2][j]
+                ans |= (1<<j)
+        print(ans+size[(parent[x2][1])],end=' ')
+    #L1 = LII()
+    #st = SI()
 solve()
