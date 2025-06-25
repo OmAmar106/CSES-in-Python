@@ -87,11 +87,11 @@ class Line:
     def __call__(self, x):
         return self.m * x + self.b
 class ConvexHull:
-    def __init__(self, n=500000):
+    def __init__(self, n=100000):
         # put n equal to max value of ai , bi , you may need to do coordinate compression in case it is upto 10**9
         # works for value which are not increasing as well
         self.n = n
-        self.seg = [Line(0, INF)] * (4 * n)
+        self.seg = [Line(0, -INF)] * (4 * n)
         self.lo = [0] * (4 * n)
         self.hi = [0] * (4 * n)
         self.build(1,1,n)
@@ -101,7 +101,7 @@ class ConvexHull:
             idx, left, right = stack.pop()
             self.lo[idx] = left
             self.hi[idx] = right
-            self.seg[idx] = Line(0, INF)
+            self.seg[idx] = Line(0, -INF)
             if left == right:
                 continue
             mid = (left + right) // 2
@@ -112,13 +112,13 @@ class ConvexHull:
         while True:
             l, r = self.lo[pos], self.hi[pos]
             if l == r:
-                if L(l) < self.seg[pos](l):
+                if L(l) > self.seg[pos](l):
                     self.seg[pos] = L
                 break
             m = (l + r) // 2
-            if self.seg[pos].m < L.m:
+            if self.seg[pos].m > L.m:
                 self.seg[pos], L = L, self.seg[pos]
-            if self.seg[pos](m) > L(m):
+            if self.seg[pos](m) < L(m):
                 self.seg[pos], L = L, self.seg[pos]
                 pos = 2*pos
             else:
@@ -130,13 +130,13 @@ class ConvexHull:
         while True:
             l, r = self.lo[pos], self.hi[pos]
             if l == r:
-                return min(res, self.seg[pos](x))
+                return max(res, self.seg[pos](x))
             m = (l + r) // 2
             if x < m:
-                res = min(res, self.seg[pos](x))
+                res = max(res, self.seg[pos](x))
                 pos = 2 * pos
             else:
-                res = min(res, self.seg[pos](x))
+                res = max(res, self.seg[pos](x))
                 pos = (2 * pos + 1)
 
 class CHT:
@@ -197,55 +197,17 @@ class CHT:
                     break
         return self.val(self.ptr, x)
     
-
-def f(line, x):
-    return line[0] * x + line[1]
- 
-class LiChao:
-    def __init__(self, lo, hi):
-        self.lo = lo
-        self.hi = hi
-        self.m = (lo + hi) // 2
-        self.line = None
-        self.left = None
-        self.right = None
-    def add_line(self, new_line):
-        l, r, m = self.lo, self.hi, self.m
-        if self.line is None:
-            self.line = new_line
-            return
-        if f(new_line, m) > f(self.line, m):
-            self.line, new_line = new_line, self.line
-        if l == r:
-            return
-        if f(new_line, l) > f(self.line, l):
-            if self.left is None:
-                self.left = LiChao(l, m)
-            self.left.add_line(new_line)
-        elif f(new_line, r) > f(self.line, r):
-            if self.right is None:
-                self.right = LiChao(m + 1, r)
-            self.right.add_line(new_line)
-    def query(self, x):
-        res = f(self.line, x) if self.line is not None else -10**18
-        if self.lo == self.hi:
-            return res
-        if x <= self.m and self.left is not None:
-            res = max(res, self.left.query(x))
-        elif x > self.m and self.right is not None:
-            res = max(res, self.right.query(x))
-        return res
-
 def solve():
-    n,q = LII()
-    a = LII()
-    b = LII()
-    cx = LiChao(-10**6-1,10**6+1)
-    cx.add_line((q,0))
-    for i in range(len(a)):
-        ans = cx.query(-a[i])
-        cx.add_line((b[i],ans))
-    print(-ans)
+    n,m = LII()
+    
+    cht = ConvexHull()
+
+    for i in range(n):
+        a,b = LII()
+        cht.insert(Line((b-a)//m,a))
+
+    for i in range(m+1):
+        print(cht.query(i),end=' ')
     #L1 = LII()
     #st = SI()
 solve()
