@@ -1,10 +1,10 @@
 import sys,math,cmath,random,os
-from heapq import heappush,heappop
-from bisect import bisect_right,bisect_left
-from collections import Counter,deque,defaultdict
-from itertools import permutations,combinations
+# from heapq import heappush,heappop
+# from bisect import bisect_right,bisect_left
+# from collections import Counter,deque,defaultdict
+# from itertools import permutations,combinations
 from io import BytesIO, IOBase
-from decimal import Decimal,getcontext
+# from decimal import Decimal,getcontext
 
 BUFSIZE = 8192
 class FastIO(IOBase):
@@ -48,24 +48,24 @@ sys.stdin, sys.stdout = IOWrapper(sys.stdin), IOWrapper(sys.stdout)
 
 # functions #
 # MOD = 998244353
-MOD = 10**9 + 7
-RANDOM = random.randrange(1,2**62)
-def gcd(a,b):
-    while b:
-        a,b = b,a%b
-    return a
-def lcm(a,b):
-    return a//gcd(a,b)*b
-def w(x):
-    return x ^ RANDOM
-II = lambda : int(sys.stdin.readline().strip())
-LII = lambda : list(map(int, sys.stdin.readline().split()))
-MI = lambda x : x(map(int, sys.stdin.readline().split()))
-SI = lambda : sys.stdin.readline().strip()
-SLI = lambda : list(map(lambda x:ord(x)-97,sys.stdin.readline().strip()))
-LII_1 = lambda : list(map(lambda x:int(x)-1, sys.stdin.readline().split()))
-LII_C = lambda x : list(map(x, sys.stdin.readline().split()))
-MATI = lambda x : [list(map(int, sys.stdin.readline().split())) for _ in range(x)]
+# MOD = 10**9 + 7
+# RANDOM = random.randrange(1,2**62)
+# def gcd(a,b):
+#     while b:
+#         a,b = b,a%b
+#     return a
+# def lcm(a,b):
+#     return a//gcd(a,b)*b
+# def w(x):
+#     return x ^ RANDOM
+# II = lambda : int(sys.stdin.readline().strip())
+# LII = lambda : list(map(int, sys.stdin.readline().split()))
+# MI = lambda x : x(map(int, sys.stdin.readline().split()))
+# SI = lambda : sys.stdin.readline().strip()
+# SLI = lambda : list(map(lambda x:ord(x)-97,sys.stdin.readline().strip()))
+# LII_1 = lambda : list(map(lambda x:int(x)-1, sys.stdin.readline().split()))
+# LII_C = lambda x : list(map(x, sys.stdin.readline().split()))
+# MATI = lambda x : [list(map(int, sys.stdin.readline().split())) for _ in range(x)]
 ##
 
 #String hashing: shclass, fenwick sortedlist: fsortl, Number: numtheory/numrare, SparseTable: SparseTable
@@ -80,43 +80,43 @@ MATI = lambda x : [list(map(int, sys.stdin.readline().split())) for _ in range(x
 # input_file = open(r'input.txt', 'r');sys.stdin = input_file
 
 def solve():
-    n,m = LII()
-    L = LII()
-    L1 = LII()
+    n = int(sys.stdin.readline().strip())
+    L = []
+    for i in range(n):
+        L.append(sys.stdin.readline().strip())
+    
+    H = [(0,0)]
 
-    seg = [0]*(4*n)
+    ans = []
 
-    def build(l=0,r=n-1,cur=1):
-        if l==r:
-            seg[cur] = L[l]
-            return
-        mid = (l+r)//2
-        build(l,mid,cur*2)
-        build(mid+1,r,cur*2+1)
-        seg[cur] = max(seg[2*cur],seg[2*cur+1])
-        return
-
-    build()
-
-    def func(val,l=0,r=n-1,cur=1):
-        if l==r:
-            if seg[cur]<val:
-                return 0
-            seg[cur] -= val
-            return l+1
-        mid = (l+r)//2
-        if seg[2*cur]>=val:
-            t = func(val,l,mid,2*cur)
-        elif seg[2*cur+1]>=val:
-            t = func(val,mid+1,r,2*cur+1)
-        else:
-            t = 0
-        seg[cur] = max(seg[2*cur],seg[2*cur+1])
-        return t
-
-    for i in L1:
-        print(func(i),end=' ')    
-
+    dirs = ((1,0),(0,1))
+    # visited = set()
+    ans.append(L[0][0])
+    flg2 = True
+    while H:
+        flag = False
+        flg1 = False
+        k = 'Z'
+        for x,y in H:
+            for dx,dy in dirs:
+                if x+dx<n and y+dy<n:
+                    flag = True
+                    k = min(k,L[x+dx][y+dy])
+            if k=='A':
+                break
+        L1 = []
+        if not flag:
+            break
+        ans.append(k)
+        
+        for x,y in H:
+            for dx,dy in dirs:
+                if x+dx<n and y+dy<n and L[x+dx][y+dy]==k and (not L1 or L1[-1]!=(x+dx,y+dy)):
+                    # visited[x+dx][y+dy] = True
+                    L1.append((x+dx,y+dy))
+        H = L1
+        
+    print(''.join(ans))
     #L1 = LII()
     #st = SI()
 solve()

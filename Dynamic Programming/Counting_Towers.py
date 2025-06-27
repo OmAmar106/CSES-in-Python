@@ -79,109 +79,16 @@ MATI = lambda x : [list(map(int, sys.stdin.readline().split())) for _ in range(x
 #Template : https://github.com/OmAmar106/Template-for-Competetive-Programming
 # input_file = open(r'input.txt', 'r');sys.stdin = input_file
 
-def extras():
-    getcontext().prec = 50
-    sys.setrecursionlimit(10**6)
-    sys.set_int_max_str_digits(10**5)
-# extras()
-
-def interactive():
-    import builtins
-    # print(globals())
-    globals()['print'] = lambda *args, **kwargs: builtins.print(*args, flush=True, **kwargs)
-# interactive()
-
-def GI(n,m=None,sub=-1,dirs=False,weight=False):
-    if m==None:
-        m = n-1
-    d = [[] for i in range(n)]
-    if not weight:
-        for i in range(m):
-            u,v = LII_C(lambda x:int(x)+sub)
-            d[u].append(v)
-            if not dirs:
-                d[v].append(u)
-    else:
-        for i in range(m):
-            u,v,w = LII()
-            d[u+sub].append((v+sub,w))
-            if not dirs:
-                d[v+sub].append((u+sub,w))
-    return d
-
-ordalp = lambda s : ord(s)-65 if s.isupper() else ord(s)-97
-alp = lambda x : chr(97+x)
-yes = lambda : print("Yes")
-no = lambda : print("No")
-yn = lambda flag : print("Yes" if flag else "No")
-printf = lambda x : print(-1 if x==float('inf') else x)
-lalp = 'abcdefghijklmnopqrstuvwxyz'
-ualp = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-dirs = ((1,0),(0,1),(-1,0),(0,-1))
-dirs8 = ((1,0),(0,1),(-1,0),(0,-1),(1,-1),(-1,1),(1,1),(-1,-1))
-ldir = {'D':(1,0),'U':(-1,0),'R':(0,1),'L':(0,-1)}
-
+dp = [[0,0],[2,0]]
+X = 10**6
+for i in range(2,X+1):
+    dp.append([0,0])
+    dp[i][0] += (4*dp[i-1][0]+dp[i-1][1])%MOD
+    dp[i][1] += (dp[i-1][0]+2*dp[i-1][1])%MOD
+    
 def solve():
-    n = II()
-    d = GI(n)
-
-    gr = d
-    n = len(gr)
-    visited = [False]*n
-    finished = [False]*n
-    stack = [0]
-    height = [0]*n
-    while stack:
-        start = stack[-1]
-        if not visited[start]:
-            visited[start] = True
-            for child in gr[start]:
-                if not visited[child]:
-                    stack.append(child)
-        else:
-            stack.pop()
-            for child in gr[start]:
-                if finished[child]:
-                    # perform the post rec operations here
-                    height[start] = max(height[start],height[child]+1)
-            finished[start] = True
-
-    n = len(gr)
-    visited = [False]*n
-    finished = [False]*n
-    stack = [0]
-    dp = [0]*n
-    while stack:
-        start = stack[-1]
-        if not visited[start]:
-            visited[start] = True
-            k1 = k2 = dp[start]
-            for child in gr[start]:
-                if not visited[child]:
-                    stack.append(child)
-                    if height[child]+1>=k1:
-                        k2 = k1
-                        k1 = height[child]+1
-                    elif height[child]+1>k2:
-                        k2 = height[child]+1
-            # print(start,L9)
-            for child in gr[start]:
-                if not visited[child]:
-                    stack.append(child)
-                    # print(height[child])
-                    dp[child] = (k1 if k1!=height[child]+1 else k2)+1
-            # print(dp)
-        else:
-            stack.pop()
-            for child in gr[start]:
-                if finished[child]:
-                    # perform the post rec operations here
-                    pass
-            finished[start] = True
-    # print(dp)
-    # print(height)
-    for i in range(len(dp)):
-        print(max(dp[i],height[i]),end=' ')
+    print(dp[II()][0])
     #L1 = LII()
     #st = SI()
-solve()
+for _ in range(II()):
+    solve()
