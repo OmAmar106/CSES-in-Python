@@ -1,5 +1,6 @@
-import sys,os
-from heapq import heappush,heappop
+import sys,math,cmath,random,os
+# from heapq import heappush,heappop
+# from bisect import bisect_right,bisect_left
 # from collections import Counter,deque,defaultdict
 # from itertools import permutations,combinations
 from io import BytesIO, IOBase
@@ -58,11 +59,11 @@ sys.stdin, sys.stdout = IOWrapper(sys.stdin), IOWrapper(sys.stdout)
 # def w(x):
 #     return x ^ RANDOM
 # II = lambda : int(sys.stdin.readline().strip())
-LII = lambda : list(map(int, sys.stdin.readline().split()))
+# LII = lambda : list(map(int, sys.stdin.readline().split()))
 # MI = lambda x : x(map(int, sys.stdin.readline().split()))
-# SI = lambda : sys.stdin.readline().strip()
+SI = lambda : sys.stdin.readline().strip()
 # SLI = lambda : list(map(lambda x:ord(x)-97,sys.stdin.readline().strip()))
-LII_1 = lambda : list(map(lambda x:int(x)-1, sys.stdin.readline().split()))
+# LII_1 = lambda : list(map(lambda x:int(x)-1, sys.stdin.readline().split()))
 # LII_C = lambda x : list(map(x, sys.stdin.readline().split()))
 # MATI = lambda x : [list(map(int, sys.stdin.readline().split())) for _ in range(x)]
 ##
@@ -78,86 +79,51 @@ LII_1 = lambda : list(map(lambda x:int(x)-1, sys.stdin.readline().split()))
 #Template : https://github.com/OmAmar106/Template-for-Competetive-Programming
 # input_file = open(r'input.txt', 'r');sys.stdin = input_file
 
-# def extras():
-#     getcontext().prec = 50
-#     sys.setrecursionlimit(10**6)
-#     sys.set_int_max_str_digits(10**5)
-# # extras()
-
-# def interactive():
-#     import builtins
-#     # print(globals())
-#     globals()['print'] = lambda *args, **kwargs: builtins.print(*args, flush=True, **kwargs)
-# interactive()
-
-# def GI(n,m=None,sub=-1,dirs=False,weight=False):
-#     if m==None:
-#         m = n-1
-#     d = [[] for i in range(n)]
-#     if not weight:
-#         for i in range(m):
-#             u,v = LII_C(lambda x:int(x)+sub)
-#             d[u].append(v)
-#             if not dirs:
-#                 d[v].append(u)
-#     else:
-#         for i in range(m):
-#             u,v,w = LII()
-#             d[u+sub].append((v+sub,w))
-#             if not dirs:
-#                 d[v+sub].append((u+sub,w))
-#     return d
-
-# ordalp = lambda s : ord(s)-65 if s.isupper() else ord(s)-97
-# alp = lambda x : chr(97+x)
-# yes = lambda : print("Yes")
-# no = lambda : print("No")
-# yn = lambda flag : print("Yes" if flag else "No")
-# printf = lambda x : print(-1 if x==float('inf') else x)
-# lalp = 'abcdefghijklmnopqrstuvwxyz'
-# ualp = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-# dirs = ((1,0),(0,1),(-1,0),(0,-1))
-# dirs8 = ((1,0),(0,1),(-1,0),(0,-1),(1,-1),(-1,1),(1,1),(-1,-1))
-# ldir = {'D':(1,0),'U':(-1,0),'R':(0,1),'L':(0,-1)}
-
-def f(L):
-    i = len(L)-1
-    while i>=1 and L[i]<L[i-1]:
-        L[i],L[i-1] = L[i-1],L[i]
-        i -= 1
-
-def djikstra(d,k):
-    t = (1<<31)-1
-    dist = [[] for i in range(len(d))]
-    dist[0].append(0)
-    H = [(0,0)]
-    while H:
-        dis,cur = heappop(H)
-        if cur==len(d)-1 and len(dist[cur])==k and dis==dist[cur][-1]:
-            print(*dist[-1])
-            exit()
-        if dis<=dist[cur][-1]:
-            for x in d[cur]:
-                L = dist[x>>31]
-                new_len = dis+(x&(t))
-                if len(L)<k:
-                    L.append(new_len)
-                    f(L)
-                    heappush(H,(new_len,x>>31))
-                elif L[-1]>new_len:
-                    L[-1] = new_len
-                    f(L)
-                    heappush(H,(new_len,x>>31))
-
 def solve():
-    n,m,k = LII()
-    d = [[] for i in range(n)]
-
-    for i in range(m):
-        u,v,w = LII_1()
-        d[u].append(((v<<31)+w+1))
-
-    djikstra(d,k)  
+    st = SI()
+    dirs = ((0,1),(0,-1),(1,0),(-1,0))
+    n = 7
+    visited = [[False]*n for i in range(n)]
+ 
+    f = {'D':(1,0),'U':(-1,0),'R':(0,1),'L':(0,-1)}
+ 
+    def rec(i,x,y):
+        if i==len(st):
+            return 1*(x==6 and y==0)
+        if visited[x][y] or (x==6 and y==0):
+            return 0
+        vis1 = [True]*4
+        for count,(dx,dy) in enumerate(dirs):
+            if 0<=x+dx<7 and 0<=y+dy<7:
+                vis1[count] = visited[x+dx][y+dy]
+ 
+        if not vis1[2] and not vis1[3] and vis1[0] and vis1[1]:
+            return 0
+        elif not vis1[0] and not vis1[1] and vis1[2] and vis1[3]:
+            return 0
+        elif 0<=x-1<7 and 0<=y+1<7 and visited[x-1][y+1] and not vis1[0] and not vis1[3]:
+            return 0
+        elif 0<=(x+1)<7 and 0<=(y+1)<7 and visited[x+1][y+1] and not vis1[0] and not vis1[2]:
+            return 0
+        elif 0<=(x-1)<7 and 0<=(y-1)<7 and visited[x-1][y-1] and not vis1[1] and not vis1[3]:           
+            return 0
+        elif 0<=(x+1)<7 and 0<=(y-1)<7 and visited[x+1][y-1] and not vis1[1] and not vis1[2]:
+            return 0
+        
+        visited[x][y] = True
+        ans = 0
+        if st[i]=='?':
+            for dx,dy in dirs:
+                if 0<=(x+dx)<7 and 0<=(y+dy)<7:
+                    ans += rec(i+1,x+dx,y+dy)
+        else:
+            dx = f[st[i]][0];dy = f[st[i]][1]
+            if 0<=x+dx<7 and 0<=y+dy<7:
+                ans += rec(i+1,x+dx,y+dy)
+        visited[x][y] = False
+        return ans
+ 
+    print(rec(0,0,0))
     #L1 = LII()
     #st = SI()
 solve()

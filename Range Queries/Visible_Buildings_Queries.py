@@ -1,5 +1,6 @@
-import sys,os
-from heapq import heappush,heappop
+import sys,math,cmath,random,os
+# from heapq import heappush,heappop
+# from bisect import bisect_right,bisect_left
 # from collections import Counter,deque,defaultdict
 # from itertools import permutations,combinations
 from io import BytesIO, IOBase
@@ -76,88 +77,66 @@ LII_1 = lambda : list(map(lambda x:int(x)-1, sys.stdin.readline().split()))
 #Graph5(djik,bfs,dfs): graph, Graph6(dfsin): dfsin, utils: utils, Persistent DSU: perdsu, Merge Sort Tree: sorttree
 #2-D BIT: 2DBIT, MonoDeque: mono
 #Template : https://github.com/OmAmar106/Template-for-Competetive-Programming
-# input_file = open(r'input.txt', 'r');sys.stdin = input_file
-
-# def extras():
-#     getcontext().prec = 50
-#     sys.setrecursionlimit(10**6)
-#     sys.set_int_max_str_digits(10**5)
-# # extras()
-
-# def interactive():
-#     import builtins
-#     # print(globals())
-#     globals()['print'] = lambda *args, **kwargs: builtins.print(*args, flush=True, **kwargs)
-# interactive()
-
-# def GI(n,m=None,sub=-1,dirs=False,weight=False):
-#     if m==None:
-#         m = n-1
-#     d = [[] for i in range(n)]
-#     if not weight:
-#         for i in range(m):
-#             u,v = LII_C(lambda x:int(x)+sub)
-#             d[u].append(v)
-#             if not dirs:
-#                 d[v].append(u)
-#     else:
-#         for i in range(m):
-#             u,v,w = LII()
-#             d[u+sub].append((v+sub,w))
-#             if not dirs:
-#                 d[v+sub].append((u+sub,w))
-#     return d
-
-# ordalp = lambda s : ord(s)-65 if s.isupper() else ord(s)-97
-# alp = lambda x : chr(97+x)
-# yes = lambda : print("Yes")
-# no = lambda : print("No")
-# yn = lambda flag : print("Yes" if flag else "No")
-# printf = lambda x : print(-1 if x==float('inf') else x)
-# lalp = 'abcdefghijklmnopqrstuvwxyz'
-# ualp = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-# dirs = ((1,0),(0,1),(-1,0),(0,-1))
-# dirs8 = ((1,0),(0,1),(-1,0),(0,-1),(1,-1),(-1,1),(1,1),(-1,-1))
-# ldir = {'D':(1,0),'U':(-1,0),'R':(0,1),'L':(0,-1)}
-
-def f(L):
-    i = len(L)-1
-    while i>=1 and L[i]<L[i-1]:
-        L[i],L[i-1] = L[i-1],L[i]
-        i -= 1
-
-def djikstra(d,k):
-    t = (1<<31)-1
-    dist = [[] for i in range(len(d))]
-    dist[0].append(0)
-    H = [(0,0)]
-    while H:
-        dis,cur = heappop(H)
-        if cur==len(d)-1 and len(dist[cur])==k and dis==dist[cur][-1]:
-            print(*dist[-1])
-            exit()
-        if dis<=dist[cur][-1]:
-            for x in d[cur]:
-                L = dist[x>>31]
-                new_len = dis+(x&(t))
-                if len(L)<k:
-                    L.append(new_len)
-                    f(L)
-                    heappush(H,(new_len,x>>31))
-                elif L[-1]>new_len:
-                    L[-1] = new_len
-                    f(L)
-                    heappush(H,(new_len,x>>31))
+# input_file = open(r'test_input.txt', 'r');sys.stdin = input_file
 
 def solve():
-    n,m,k = LII()
-    d = [[] for i in range(n)]
+    n,q = LII()
+    L = LII()
 
-    for i in range(m):
-        u,v,w = LII_1()
-        d[u].append(((v<<31)+w+1))
+    st = []
+    next = [n]*n
+ 
+    for i in range(len(L)-1,-1,-1):
+        while st and L[st[-1]]<=L[i]:
+            st.pop()
+        if st:
+            next[i] = st[-1]
+        st.append(i)
 
-    djikstra(d,k)  
+    L = []
+    for i in range(q):
+        l,r = LII_1()
+        L.append((l,r,i))
+    
+    ans = []
+    i = 0
+    while next[i]!=n:
+        ans.append(i)
+        i = next[i]
+
+    ans.append(i)
+    ans.reverse()
+ 
+    L.sort()
+    fans = [0]*q
+    # print(next)
+    for l,r,index in L:
+        # print(l,r,index,ans)
+        while ans[-1]<l:
+            t = ans.pop()
+            ans2 = [t+1]
+            if ans and t+1==ans[-1]:
+                continue
+            while next[ans2[-1]]!=n and (not ans or next[ans2[-1]]!=ans[-1]):
+                ans2.append(next[ans2[-1]])
+            # print(ans2)
+            ans.extend(ans2[::-1])
+        # print(l,r,index,ans)
+ 
+        start = 0
+        end = len(ans)-1
+        while start<=end:
+            mid = (start+end)//2
+            if ans[mid]<=r:
+                end = mid-1
+            else:
+                start = mid+1
+        
+        # for i in range(len(ans)):
+        #     print(L1[ans[i]])
+        fans[index] = len(ans)-end-1
+
+    print('\n'.join(map(str,fans)))
     #L1 = LII()
     #st = SI()
 solve()
