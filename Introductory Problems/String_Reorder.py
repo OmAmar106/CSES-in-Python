@@ -75,30 +75,39 @@ MATI = lambda x : [list(map(int, sys.stdin.readline().split())) for _ in range(x
 #Persistent Segment Tree: perseg, Binary Trie: b_trie, HLD: hld, String funcs: sf, Segment Tree(lp): SegmentOther
 #Graph1(dnc,bl): graphadv, Graph2(khn,sat): 2sat, Graph3(fltn,bprt): graphflatten, Graph4(ep,tp,fw,bmf): graphoth
 #Graph5(djik,bfs,dfs): graph, Graph6(dfsin): dfsin, utils: utils, Persistent DSU: perdsu, Merge Sort Tree: sorttree
-#2-D BIT: 2DBIT, MonoDeque: mono
+#2-D BIT: 2DBIT, MonoDeque: mono, nummat: matrix
 #Template : https://github.com/OmAmar106/Template-for-Competetive-Programming
 # input_file = open(r'input.txt', 'r');sys.stdin = input_file
 
 def solve():
-    n,m = LII()
-    d = [[] for i in range(n)]
-    for i in range(m):
-        u,v = LII_1()
-        d[u].append(v)
-    
-    dp = [[0]*(n) for i in range(1<<n)]
-
-    dp[1][0] = 1
-    for i in range(1,1<<n):
-        for j in range(n):
-            if dp[i][j]:
-                for k in d[j]:
-                    if not i&(1<<k):
-                        dp[i^(1<<k)][k] += dp[i][j]
-                        dp[i^(1<<k)][k] %= MOD
-    # for i in dp:
-    #     print(*i)
-    print(dp[-1][-1])
     #L1 = LII()
-    #st = SI()
+    st = SI()
+
+    d = [0]*26
+    for i in st:
+        d[ord(i)-65] += 1
+
+    ans = []
+
+    def func(d,j):
+        d[j] -= 1
+        k = max(d)
+        k1 = sum(d)
+        d[j] += 1
+        return k1-k>=k-1
+
+    for i in range(len(st)):
+        flag = False
+        for j in range(26):
+            if d[j] and func(d,j) and (not ans or ans[-1]!=j):
+                flag = True
+                d[j] -= 1
+                ans.append(j)
+                break
+        # print(ans)
+        if not flag:
+            print(-1)
+            return
+    
+    print(''.join(map(lambda x:chr(65+x),ans)))
 solve()

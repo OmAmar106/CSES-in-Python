@@ -1,260 +1,162 @@
-import sys,math,random
+import sys,math,cmath,random,os
 from heapq import heappush,heappop
 from bisect import bisect_right,bisect_left
 from collections import Counter,deque,defaultdict
-from itertools import permutations
+from itertools import permutations,combinations
+from io import BytesIO, IOBase
+from decimal import Decimal,getcontext
+
+BUFSIZE = 8192
+class FastIO(IOBase):
+    newlines = 0
+    def __init__(self, file):
+        self._file = file
+        self._fd = file.fileno()
+        self.buffer = BytesIO()
+        self.writable = "x" in file.mode or "r" not in file.mode
+        self.write = self.buffer.write if self.writable else None
+    def read(self):
+        while True:
+            b = os.read(self._fd, max(os.fstat(self._fd).st_size, BUFSIZE))
+            if not b:
+                break
+            ptr = self.buffer.tell()
+            self.buffer.seek(0, 2), self.buffer.write(b), self.buffer.seek(ptr)
+        self.newlines = 0
+        return self.buffer.read()
+    def readline(self):
+        while self.newlines == 0:
+            b = os.read(self._fd, max(os.fstat(self._fd).st_size, BUFSIZE))
+            self.newlines = b.count(b"\n") + (not b)
+            ptr = self.buffer.tell()
+            self.buffer.seek(0, 2), self.buffer.write(b), self.buffer.seek(ptr)
+        self.newlines -= 1
+        return self.buffer.readline()
+    def flush(self):
+        if self.writable:
+            os.write(self._fd, self.buffer.getvalue())
+            self.buffer.truncate(0), self.buffer.seek(0)
+class IOWrapper(IOBase):
+    def __init__(self, file):
+        self.buffer = FastIO(file)
+        self.flush = self.buffer.flush
+        self.writable = self.buffer.writable
+        self.write = lambda s: self.buffer.write(s.encode("ascii"))
+        self.read = lambda: self.buffer.read().decode("ascii")
+        self.readline = lambda: self.buffer.readline().decode("ascii")
+sys.stdin, sys.stdout = IOWrapper(sys.stdin), IOWrapper(sys.stdout)
 
 # functions #
-MOD = 998244353
+# MOD = 998244353
 MOD = 10**9 + 7
-RANDOM = random.randrange(2**62)
+RANDOM = random.randrange(1,2**62)
 def gcd(a,b):
-    if a%b==0:
-        return b
-    else:
-        return gcd(b,a%b)
+    while b:
+        a,b = b,a%b
+    return a
 def lcm(a,b):
     return a//gcd(a,b)*b
 def w(x):
     return x ^ RANDOM
+II = lambda : int(sys.stdin.readline().strip())
+LII = lambda : list(map(int, sys.stdin.readline().split()))
+MI = lambda x : x(map(int, sys.stdin.readline().split()))
+SI = lambda : sys.stdin.readline().strip()
+SLI = lambda : list(map(lambda x:ord(x)-97,sys.stdin.readline().strip()))
+LII_1 = lambda : list(map(lambda x:int(x)-1, sys.stdin.readline().split()))
+LII_C = lambda x : list(map(x, sys.stdin.readline().split()))
+MATI = lambda x : [list(map(int, sys.stdin.readline().split())) for _ in range(x)]
 ##
 
-#String hashing : sh, fenwick sortedlist : fsortl, Number : numtheory, SparseTable : SparseTable
-#bucket sorted list : bsortl, segment tree(lazy propogation) : SegmentTree, bootstrap : bootstrap
-#binary indexed tree : BIT, segment tree(point updates) : SegmentPoint, Convex Hull : hull
-#Combinatorics : pnc, Diophantine Equations : dpheq, Graphs : graphs, DSU : DSU
+#String hashing: shclass, fenwick sortedlist: fsortl, Number: numtheory/numrare, SparseTable: SparseTable
+#Bucket Sorted list: bsortl, Segment Tree(lp,selfop): SegmentTree, bootstrap: bootstrap, Trie: tries
+#binary indexed tree: BIT, Segment Tree(point updates): SegmentPoint, Convex Hull: hull, BitArray: bitarray
+#Combinatorics: pnc, Diophantine Equations: dpheq, DSU: DSU, Geometry: Geometry, FFT: fft, XOR_dict: xdict
+#Persistent Segment Tree: perseg, Binary Trie: b_trie, HLD: hld, String funcs: sf, Segment Tree(lp): SegmentOther
+#Graph1(dnc,bl): graphadv, Graph2(khn,sat): 2sat, Graph3(fltn,bprt): graphflatten, Graph4(ep,tp,fw,bmf): graphoth
+#Graph5(djik,bfs,dfs): graph, Graph6(dfsin): dfsin, utils: utils, Persistent DSU: perdsu, Merge Sort Tree: sorttree
+#2-D BIT: 2DBIT, MonoDeque: mono, nummat: matrix
 #Template : https://github.com/OmAmar106/Template-for-Competetive-Programming
+# input_file = open(r'input.txt', 'r');sys.stdin = input_file
 
-def bellman_ford(n, edges, start):
-    dist = [float("inf")] * n
-    pred = [None] * n
-    dist[start] = 0
-    for _ in range(n):
-        for u, v, d in edges:
-            if dist[u] + d < dist[v]:
-                dist[v] = dist[u] + d
-                pred[v] = u
-    # for u, v, d in edges:
-    #	 if dist[u] + d < dist[v]:
-    #		 return -1
-    # This returns -1 , if there is a negative cycle
+from types import GeneratorType
 
-class binary_lift:
-    def __init__(self, graph, data=(), f=min, root=0):
-        n = len(graph)
-        parent = [-1] * (n + 1)
-        depth = self.depth = [-1] * n
-        bfs = [root]
-        depth[root] = 0
-        for node in bfs:
-            for nei in graph[node]:
-                if depth[nei] == -1:
-                    parent[nei] = node
-                    depth[nei] = depth[node] + 1
-                    bfs.append(nei)
-
-        data = self.data = [data]
-        parent = self.parent = [parent]
-        self.f = f
-
-        for _ in range(max(depth).bit_length()):
-            old_data = data[-1]
-            old_parent = parent[-1]
-            data.append([f(val, old_data[p]) for val,p in zip(old_data, old_parent)])
-            parent.append([old_parent[p] for p in old_parent])
-
-    def lca(self, a, b):
-        depth = self.depth
-        parent = self.parent
-        if depth[a] < depth[b]:
-            a,b = b,a
-        d = depth[a] - depth[b]
-        for i in range(d.bit_length()):
-            if (d >> i) & 1:
-                a = parent[i][a]
-        for i in range(depth[a].bit_length())[::-1]:
-            if parent[i][a] != parent[i][b]:
-                a = parent[i][a]
-                b = parent[i][b]
-        if a != b:
-            return parent[0][a]
+def bootstrap(f, stack=[]):
+    def wrappedfunc(*args, **kwargs):
+        if stack:
+            return f(*args, **kwargs)
         else:
-            return a
-    def distance(self, a, b):
-        return self.depth[a] + self.depth[b] - 2 * self.depth[self.lca(a,b)]
-    def kth_ancestor(self, a, k):
-        parent = self.parent
-        if self.depth[a] < k:
-            return -1
-        for i in range(k.bit_length()):
-            if (k >> i) & 1:
-                a = parent[i][a]
-        return a
-    def __call__(self, a, b):
-        depth = self.depth
-        parent = self.parent
-        data = self.data
-        f = self.f
-        c = self.lca(a, b)
-        val = data[0][c]
-        for x,d in (a, depth[a] - depth[c]), (b, depth[b] - depth[c]):
-            for i in range(d.bit_length()):
-                if (d >> i) & 1:
-                    val = f(val, data[i][x])
-                    x = parent[i][x]
-        return val
+            to = f(*args, **kwargs)
+            while True:
+                if type(to) is GeneratorType:
+                    stack.append(to)
+                    to = next(to)
+                else:
+                    stack.pop()
+                    if not stack:
+                        break
+                    to = stack[-1].send(to)
+            return to
+    return wrappedfunc
 
-def floyd_warshall(n, edges):
-    dist = [[0 if i == j else float("inf") for i in range(n)] for j in range(n)]
-    pred = [[None] * n for _ in range(n)]
+# @bootstrap
+# put this just on top of recursion function to increase the recursion limit
 
-    for u, v, d in edges:
-        dist[u][v] = d
-        pred[u][v] = u
-
-    for k in range(n):
-        for i in range(n):
-            for j in range(n):
-                if dist[i][k] + dist[k][j] < dist[i][j]:
-                    dist[i][j] = dist[i][k] + dist[k][j]
-                    pred[i][j] = pred[k][j]
-    # Sanity Check
-    # for u, v, d in edges:
-    #	 if dist[u] + d < dist[v]:
-    #		 return None
-
-    return dist, pred
-
-def dijkstra(graph, start ,n):
-    dist, parents = [float("inf")] * n, [-1] * n
-    dist[start] = 0
-    queue = [(0, start)]
-    while queue:
-        path_len, v = heappop(queue)
-        if path_len == dist[v]:
-            for w, edge_len in graph[v]:
-                if edge_len + path_len < dist[w]:
-                    dist[w], parents[w] = edge_len + path_len, v
-                    heappush(queue, (edge_len + path_len, w))
-    return dist, parents
-
-def toposort(graph):
-    res, found = [], [0] * len(graph)
-    stack = list(range(len(graph)))
-    while stack:
-        node = stack.pop()
-        if node < 0:
-            res.append(~node)
-        elif not found[node]:
-            found[node] = 1
-            stack.append(~node)
-            stack += graph[node]
-    for node in res:
-        if any(found[nei] for nei in graph[node]):
-            return None
-        found[node] = 0
-    return res[::-1]
-
-def kahn(graph):
-    n = len(graph)
-    indeg, idx = [0] * n, [0] * n
-    for i in range(n):
-        for e in graph[i]:
-            indeg[e] += 1
-    q, res = [], []
-    for i in range(n):
-        if indeg[i] == 0:
-            q.append(i)
-    nr = 0
-    while q:
-        res.append(q.pop())
-        idx[res[-1]], nr = nr, nr + 1
-        for e in graph[res[-1]]:
-            indeg[e] -= 1
-            if indeg[e] == 0:
-                q.append(e)
-    return res, idx, nr == n
-
-def bfs(graph, start=0):
-    used = [False] * len(graph)
-    used[start] = True
-    q = [start]
-    for v in q:
-        for w in graph[v]:
-            if not used[w]:
-                used[w] = True
-                q.append(w)
-
-def dfs(graph, start=0):
-    n = len(graph)
-    dp = [0] * n
-    visited, finished = [False] * n, [False] * n
-    stack = [start]
-    while stack:
-        start = stack[-1]
-        if not visited[start]:
-            visited[start] = True
-            for child in graph[start]:
-                if not visited[child]:
-                    stack.append(child)
-        else:
-            stack.pop()
-            dp[start] += 1
-            for child in graph[start]:
-                if finished[child]:
-                    dp[start] += dp[child]
-            finished[start] = True
-    return visited, dp
-
-def rec(cur,color):
-    # If asking for SCC, rather than d, use the reversed graph
-    # Also the traversel should be in reverse of topological order
-    visited = [],ans = [],d = {} # remove this
-    visited[cur] = True
-    ans[cur] = color
-    for i in d[cur]:
-        if visited[i]:
-            continue
-        ans1 = (yield rec(i,color))
-    yield -1
-
-def euler_path(d,in1,out):
-    start = [0]
-    ans = []
-    while start:
-        cur = start[-1]
-        if in1[cur]==0 and out[cur]==0:
-            ans.append(cur)
-            start.pop()
-            continue
-        k1 = d[cur].pop()
-        # if cur in d[k1]:
-        #     d[k1].remove(cur)
-        in1[k1] -= 1
-        out[cur] -= 1
-        start.append(k1)
-    return ans[::-1]
+# rather than return now use yield and when function being called inside itself, use yield before the function name
+# example usage:
+# @bootstrap
+# def rec1(L,k,cur,count):
+# 	if count>=100000:
+# 		yield float('INF')
+# 	if cur+k+1>=len(L)-1:
+# 		yield L[cur]+2
+# 	if cur in d:
+# 		yield d[cur]
+# 	ans = float('INF')
+# 	mini = float('INF')
+# 	for i in range(k+1,0,-1):
+# 		if L[cur+i]<mini:
+# 			ans = min(ans,1+L[cur]+(yield rec1(L,k,cur+i,count+1)))
+# 			mini = L[cur+i]
+# 	d[cur] = ans
+# 	yield ans
+# the limit of recursion on cf is 10**6
 
 def solve():
-    n = int(sys.stdin.readline().strip())
-    d = defaultdict(set)
-    indeg = Counter()
-    outdeg = Counter()
-    for i in range(0,(1<<n)):
-        num1 = i*2+1
-        num2 = i*2
-        num1 %= (1<<n)
-        num2 %= (1<<n)
-        if i!=num1:
-            d[i].add(num1)
-            outdeg[i] += 1
-            indeg[num1] += 1
-        if i!=num2:
-            d[i].add(num2)
-            outdeg[i] += 1
-            indeg[num2] += 1
+    n = II()
     
-    print(*euler_path(d,indeg,outdeg))
-    #L1 = list(map(int, sys.stdin.readline().split()))
-    #st = sys.stdin.readline().strip()
+    d = [set() for i in range(1<<n)]
+    visited = [False]*(1<<n)
+    ans = []
+
+    @bootstrap
+    def euler(cur):
+        for j in d[cur]:
+            if not visited[j]:
+                visited[j] = True
+                f = (yield euler(j))
+                # d[j].remove(cur)
+        # d[cur].clear()
+        ans.append(cur)
+        yield -1
+
+    for i in range(1<<n):
+        f = (i<<1)&((1<<n)-1)
+        d[i].add(f)
+        d[i].add(f^1)
+
+    visited[0] = True
+    euler(0)
+
+    ans = ans[::-1]
+
+    for i in ans:
+        if i:
+            print(i%2,end='')
+        else:
+            print('0'*n,end='')
+    
+    #L = LII()
+    #L1 = LII()
+    #st = SI()
 solve()

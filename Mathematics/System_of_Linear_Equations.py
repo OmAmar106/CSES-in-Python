@@ -79,26 +79,69 @@ MATI = lambda x : [list(map(int, sys.stdin.readline().split())) for _ in range(x
 #Template : https://github.com/OmAmar106/Template-for-Competetive-Programming
 # input_file = open(r'input.txt', 'r');sys.stdin = input_file
 
+
+def transpose(mat):
+    return [list(col) for col in zip(*mat)]
+
+def matmul(L,B,MOD=(10**9 + 7)):
+    ans = [[0 for i in range(len(B[0]))] for j in range(len(L))]
+    for i in range(len(L)):
+        for j in range(len(B[0])):
+            for k in range(len(B)):
+                ans[i][j] = (ans[i][j]+L[i][k]*B[k][j])%MOD
+    return ans
+
+def matpow(M,power):
+    size = len(M)
+    result = [[1 if i == j else 0 for j in range(size)] for i in range(size)]
+    while power:
+        if power % 2 == 1:
+            result = matmul(result, M)
+        M = matmul(M, M)
+        power //= 2
+    return result
+
+def gauss(A,mod=MOD):
+    m,n = len(A),len(A[0])-1
+    rank = 0
+    L = [-1]*n
+
+    for col in range(n):
+        for row in range(rank,m):
+            if A[row][col]:
+                A[rank],A[row] = A[row],A[rank]
+                break
+        else:
+            continue  
+        k = pow(A[rank][col],-1,mod)
+        for j in range(col,n+1):
+            A[rank][j] = A[rank][j]*k%mod
+
+        for row in range(m):
+            if row!=rank and A[row][col]:
+                factor = A[row][col]
+                for j in range(col,n+1):
+                    A[row][j] -= factor*A[rank][j]
+                    A[row][j] %= mod
+        L[col] = rank
+        rank += 1
+    for row in range(rank, m):
+        if A[row][n]:
+            return None
+    return [A[L[i]][n]  if L[i]!=-1 else 0 for i in range(len(L))]
+
 def solve():
     n,m = LII()
-    d = [[] for i in range(n)]
-    for i in range(m):
-        u,v = LII_1()
-        d[u].append(v)
+    L1 = []
+    for i in range(n):
+        L1.append(LII())    
+    L3 = gauss(L1)
+    # f = matmul(L3,L2)
+    if not L3:
+        print(-1)
+        return
     
-    dp = [[0]*(n) for i in range(1<<n)]
-
-    dp[1][0] = 1
-    for i in range(1,1<<n):
-        for j in range(n):
-            if dp[i][j]:
-                for k in d[j]:
-                    if not i&(1<<k):
-                        dp[i^(1<<k)][k] += dp[i][j]
-                        dp[i^(1<<k)][k] %= MOD
-    # for i in dp:
-    #     print(*i)
-    print(dp[-1][-1])
+    print(*[round(i)%MOD for i in L3])
     #L1 = LII()
     #st = SI()
 solve()

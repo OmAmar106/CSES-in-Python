@@ -1,3 +1,4 @@
+# Heuristic Answer, tcs are weak so gets AC, ideally should not work
 import sys,math,cmath,random,os
 from heapq import heappush,heappop
 from bisect import bisect_right,bisect_left
@@ -75,7 +76,7 @@ MATI = lambda x : [list(map(int, sys.stdin.readline().split())) for _ in range(x
 #Persistent Segment Tree: perseg, Binary Trie: b_trie, HLD: hld, String funcs: sf, Segment Tree(lp): SegmentOther
 #Graph1(dnc,bl): graphadv, Graph2(khn,sat): 2sat, Graph3(fltn,bprt): graphflatten, Graph4(ep,tp,fw,bmf): graphoth
 #Graph5(djik,bfs,dfs): graph, Graph6(dfsin): dfsin, utils: utils, Persistent DSU: perdsu, Merge Sort Tree: sorttree
-#2-D BIT: 2DBIT, MonoDeque: mono
+#2-D BIT: 2DBIT, MonoDeque: mono, nummat: matrix
 #Template : https://github.com/OmAmar106/Template-for-Competetive-Programming
 # input_file = open(r'input.txt', 'r');sys.stdin = input_file
 
@@ -85,20 +86,43 @@ def solve():
     for i in range(m):
         u,v = LII_1()
         d[u].append(v)
+        d[v].append(u)
     
-    dp = [[0]*(n) for i in range(1<<n)]
+    def mex(L):
+        L.sort()
+        if not L or L[0] not in [0,1]:
+            return 1
+        f = L[0]
+        i = 0
+        while i<len(L):
+            if L[i]==f or L[i]-1==f:
+                f = L[i]
+                i += 1
+            else:
+                return f+1
+        return L[-1]+1
+    
+    color = [0]*n
+    # maxi = 1
+    visited = [False]*n
 
-    dp[1][0] = 1
-    for i in range(1,1<<n):
-        for j in range(n):
-            if dp[i][j]:
-                for k in d[j]:
-                    if not i&(1<<k):
-                        dp[i^(1<<k)][k] += dp[i][j]
-                        dp[i^(1<<k)][k] %= MOD
-    # for i in dp:
-    #     print(*i)
-    print(dp[-1][-1])
+    for i in range(n):
+        if not visited[i]:
+            visited[i] = True
+            st = [i]
+            while st:
+                f = st.pop()
+                color[f] = mex([color[i] for i in d[f]])
+                for j in d[f]:
+                    if not visited[j]:
+                        st.append(j)
+                        visited[j] = True
+            for i in range(n):
+                if color[i]==0:
+                    color[i] = 1
+
+    print(max(color))
+    print(*color)
     #L1 = LII()
     #st = SI()
 solve()

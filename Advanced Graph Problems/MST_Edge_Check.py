@@ -75,30 +75,96 @@ MATI = lambda x : [list(map(int, sys.stdin.readline().split())) for _ in range(x
 #Persistent Segment Tree: perseg, Binary Trie: b_trie, HLD: hld, String funcs: sf, Segment Tree(lp): SegmentOther
 #Graph1(dnc,bl): graphadv, Graph2(khn,sat): 2sat, Graph3(fltn,bprt): graphflatten, Graph4(ep,tp,fw,bmf): graphoth
 #Graph5(djik,bfs,dfs): graph, Graph6(dfsin): dfsin, utils: utils, Persistent DSU: perdsu, Merge Sort Tree: sorttree
-#2-D BIT: 2DBIT, MonoDeque: mono
+#2-D BIT: 2DBIT, MonoDeque: mono, nummat: matrix
 #Template : https://github.com/OmAmar106/Template-for-Competetive-Programming
 # input_file = open(r'input.txt', 'r');sys.stdin = input_file
 
+class UnionFind:
+    def __init__(self, n):
+        self.parent = list(range(n))
+
+    def find(self, a):
+        acopy = a
+        while a != self.parent[a]:
+            a = self.parent[a]
+        while acopy != a:
+            self.parent[acopy], acopy = a, self.parent[acopy]
+        return a
+
+    def union(self, a, b):
+        self.parent[self.find(b)] = self.find(a)
+
+
+class DisjointSetUnion:
+    def __init__(self, n):
+        self.parent = list(range(n))
+        # self.s = set(self.parent)
+        self.size = [1] * n
+        self.flags = [set() for _ in range(n)]
+        self.ans = {}
+
+    def find(self, a):
+        acopy = a
+        while a != self.parent[a]:
+            a = self.parent[a]
+        while acopy != a:
+            self.parent[acopy], acopy = a, self.parent[acopy]
+        return a
+
+    def union(self, a, b, w):
+        a, b = self.find(a), self.find(b)
+        if a != b:
+            if self.size[a] < self.size[b]:
+                a, b = b, a
+            # self.s.remove(b)
+            if len(self.flags[a])<len(self.flags[b]):
+                self.flags[a],self.flags[b] = self.flags[b],self.flags[a]
+
+            for j in self.flags[b]:
+                if j in self.flags[a]:
+                    self.flags[a].remove(j)
+                    self.ans[j] = w
+                else:
+                    self.flags[a].add(j)
+            self.flags[b].clear()
+            self.parent[b] = a
+            self.size[a] += self.size[b]
+
+    def set_size(self, a):
+        return self.size[self.find(a)]
+
+    def __len__(self):
+        return len(self.s)
+
+    def notfind(self, a):
+        k = self.find(a)
+        for j in self.s:
+            if j!=k:
+                return j
+        return -1
+    
 def solve():
     n,m = LII()
-    d = [[] for i in range(n)]
-    for i in range(m):
-        u,v = LII_1()
-        d[u].append(v)
-    
-    dp = [[0]*(n) for i in range(1<<n)]
+    L = []
+    ds = DisjointSetUnion(n)
+    for _ in range(m):
+        u,v,w = LII_1()
+        L.append((w+1,u,v,_))
+        ds.flags[u].add(_)
+        ds.flags[v].add(_)
 
-    dp[1][0] = 1
-    for i in range(1,1<<n):
-        for j in range(n):
-            if dp[i][j]:
-                for k in d[j]:
-                    if not i&(1<<k):
-                        dp[i^(1<<k)][k] += dp[i][j]
-                        dp[i^(1<<k)][k] %= MOD
-    # for i in dp:
-    #     print(*i)
-    print(dp[-1][-1])
+    L.sort()
+
+    for w,u,v,ind in L:
+        ds.union(u,v,w)
+    
+    ans = ["NO"]*m
+
+    for w,u,v,ind in L:
+        if ds.ans[ind]==w:
+            ans[ind] = "YES"
+    
+    print('\n'.join(ans))
     #L1 = LII()
     #st = SI()
 solve()

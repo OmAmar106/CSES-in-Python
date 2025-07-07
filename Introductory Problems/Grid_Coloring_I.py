@@ -75,30 +75,27 @@ MATI = lambda x : [list(map(int, sys.stdin.readline().split())) for _ in range(x
 #Persistent Segment Tree: perseg, Binary Trie: b_trie, HLD: hld, String funcs: sf, Segment Tree(lp): SegmentOther
 #Graph1(dnc,bl): graphadv, Graph2(khn,sat): 2sat, Graph3(fltn,bprt): graphflatten, Graph4(ep,tp,fw,bmf): graphoth
 #Graph5(djik,bfs,dfs): graph, Graph6(dfsin): dfsin, utils: utils, Persistent DSU: perdsu, Merge Sort Tree: sorttree
-#2-D BIT: 2DBIT, MonoDeque: mono
+#2-D BIT: 2DBIT, MonoDeque: mono, nummat: matrix
 #Template : https://github.com/OmAmar106/Template-for-Competetive-Programming
 # input_file = open(r'input.txt', 'r');sys.stdin = input_file
 
 def solve():
     n,m = LII()
-    d = [[] for i in range(n)]
-    for i in range(m):
-        u,v = LII_1()
-        d[u].append(v)
-    
-    dp = [[0]*(n) for i in range(1<<n)]
+    ans = []
+    for i in range(n):
+        ans.append(list(SI()))
+        for j in range(m):
+            if (i+j)%2 and ans[i][j]!='C':
+                ans[i][j] = 'C'
+            elif (i+j)%2==0 and ans[i][j]!='D':
+                ans[i][j] = 'D'
+            elif ans[i][j]=='C':
+                ans[i][j] = 'A'
+            elif ans[i][j]=='D':
+                ans[i][j] = 'B'
 
-    dp[1][0] = 1
-    for i in range(1,1<<n):
-        for j in range(n):
-            if dp[i][j]:
-                for k in d[j]:
-                    if not i&(1<<k):
-                        dp[i^(1<<k)][k] += dp[i][j]
-                        dp[i^(1<<k)][k] %= MOD
-    # for i in dp:
-    #     print(*i)
-    print(dp[-1][-1])
+    for i in ans:
+        print(''.join(i))
     #L1 = LII()
     #st = SI()
 solve()
