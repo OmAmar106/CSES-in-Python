@@ -79,60 +79,99 @@ MATI = lambda x : [list(map(int, sys.stdin.readline().split())) for _ in range(x
 #Template : https://github.com/OmAmar106/Template-for-Competetive-Programming
 # input_file = open(r'input.txt', 'r');sys.stdin = input_file
 
-def extras():
-    getcontext().prec = 50
-    sys.setrecursionlimit(10**6)
-    # sys.set_int_max_str_digits(10**5)
-extras()
+class SegmentTree:
+    def __init__(self, L):
+        self.n = len(L)
+        self.N = 1<<(self.n-1).bit_length()
+        size = self.N << 1
+        self.tree = [0] * size
+        self.lazy = [0] * size     
+        self.lazy1 = [0] * size 
+        for i in range(self.n):
+            self.tree[self.N + i] = L[i]
+        for i in range(self.N - 1, 0, -1):
+            self.tree[i] = self.tree[i << 1] + self.tree[i << 1 | 1]
 
-def interactive():
-    import builtins
-    # print(globals())
-    globals()['print'] = lambda *args, **kwargs: builtins.print(*args, flush=True, **kwargs)
-# interactive()
+    def _apply(self, p, length, base, slope):
+        self.tree[p] += base * length + slope * length * (length + 1) // 2
+        if p < self.N:
+            self.lazy[p] += base
+            self.lazy1[p] += slope
 
-def GI(n,m=None,sub=-1,dirs=False,weight=False):
-    if m==None:
-        m = n-1
-    d = [[] for i in range(n)]
-    if not weight:
-        for i in range(m):
-            u,v = LII_C(lambda x:int(x)+sub)
-            d[u].append(v)
-            if not dirs:
-                d[v].append(u)
-    else:
-        for i in range(m):
-            u,v,w = LII()
-            d[u+sub].append((v+sub,w))
-            if not dirs:
-                d[v+sub].append((u+sub,w))
-    return d
+    def _push(self, p):
+        s = self.N.bit_length()
+        for h in range(s, 0, -1):
+            i = p >> h
+            if self.lazy[i] != 0 or self.lazy1[i] != 0:
+                length = 1 << (h - 1)
+                self._apply(i << 1, length, self.lazy[i], self.lazy1[i])
+                offset = self.lazy[i] + self.lazy1[i] * length
+                self._apply(i << 1 | 1, length, offset, self.lazy1[i])
+                self.lazy[i] = self.lazy1[i] = 0
 
-ordalp = lambda s : ord(s)-65 if s.isupper() else ord(s)-97
-alp = lambda x : chr(97+x)
-yes = lambda : print("Yes")
-no = lambda : print("No")
-yn = lambda flag : print("Yes" if flag else "No")
-printf = lambda x : print(-1 if x==float('inf') else x)
-lalp = 'abcdefghijklmnopqrstuvwxyz'
-ualp = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-dirs = ((1,0),(0,1),(-1,0),(0,-1))
-dirs8 = ((1,0),(0,1),(-1,0),(0,-1),(1,-1),(-1,1),(1,1),(-1,-1))
-ldir = {'D':(1,0),'U':(-1,0),'R':(0,1),'L':(0,-1)}
+    def _rebuild(self, p):
+        while p > 1:
+            p >>= 1
+            self.tree[p] = self.tree[p << 1] + self.tree[p << 1 | 1]
+            if self.lazy[p] or self.lazy1[p]:
+                length = (self.N >> (p.bit_length() - 1))
+                self.tree[p] += self.lazy[p] * length + self.lazy1[p] * length * (length + 1) // 2
 
-from decimal import Decimal, ROUND_HALF_EVEN
+    def update(self, l, r):
+        l0, r0 = l + self.N, r + self.N
+        self._push(l0)
+        self._push(r0)
+        length = 1
+        base_left = 0
+        base_right = r - l 
+        l1, r1 = l0, r0
+        while l1 <= r1:
+            if l1 & 1:
+                self._apply(l1, length, base_left, 1)
+                base_left += length
+                l1 += 1
+            if not r1 & 1:
+                self._apply(r1, length, base_right - length + 1, 1)
+                base_right -= length
+                r1 -= 1
+            l1 >>= 1
+            r1 >>= 1
+            length <<= 1
+        self._rebuild(l0)
+        self._rebuild(r0)
+
+    def query(self, l, r):
+        l += self.N
+        r += self.N
+        self._push(l)
+        self._push(r)
+        res = 0
+        while l <= r:
+            if l & 1:
+                res += self.tree[l]
+                l += 1
+            if not r & 1:
+                res += self.tree[r]
+                r -= 1
+            l >>= 1
+            r >>= 1
+        return res
+
 def solve():
-    n,k1 = LII()
-    ans = 0
-    prev = 0
-    for i in range(1,k1+1):
-        k = (i**n)
-        ans += i*((k-(prev)))
-        prev = k
- 
-    value = Decimal(ans)/Decimal(k1**n)
-    rounded_value = value.quantize(Decimal('0.000001'), rounding=ROUND_HALF_EVEN)
-    print(rounded_value)
+    n,q = LII()
+    L = LII()
 
+    seg = SegmentTree(L)
+
+    for i in range(q):
+        t,a,b = LII()
+        if t==1:
+            seg.update(a-1,b-1)
+            # for i in range(42,51):
+            #     print(seg.query(i,i),end=' ')
+            # print()
+        else:
+            print(seg.query(a-1,b-1))
+    #L1 = LII()
+    #st = SI()
 solve()
