@@ -75,45 +75,67 @@ MATI = lambda x : [list(map(int, sys.stdin.readline().split())) for _ in range(x
 #Persistent Segment Tree: perseg, Binary Trie: b_trie, HLD: hld, String funcs: sf, Segment Tree(lp): SegmentOther
 #Graph1(dnc,bl): graphadv, Graph2(khn,sat): 2sat, Graph3(fltn,bprt): graphflatten, Graph4(ep,tp,fw,bmf): graphoth
 #Graph5(djik,bfs,dfs): graph, Graph6(dfsin): dfsin, utils: utils, Persistent DSU: perdsu, Merge Sort Tree: sorttree
-#2-D BIT: 2DBIT, MonoDeque: mono, nummat: matrix, SuffixAutomaton: sautomaton
+#2-D BIT: 2DBIT, MonoDeque: mono, nummat: matrix, SuffixAutomaton: sautomaton, linalg: linalg, SquareRtDecomp: sqrt
+#Grapth7(bridges): graph_dmgt, FWHT(^,|,&): fwht
 #Template : https://github.com/OmAmar106/Template-for-Competetive-Programming
-# input_file = open(r'input.txt', 'r');sys.stdin = input_file
+#if os.environ.get('LOCAL'):sys.stdin = open(r'input.txt', 'r');sys.stdout = open(r'output.txt','w')
  
 def solve():
-    n,k = LII()
-    L = LII_C(lambda x:int(x)-k)
+    n = II()
  
-    mini = 0
-    maxi = 0
-    for i in L:
-        if i<0:
-            mini -= i
-        else:
-            maxi += i
-    # print(max(mini,maxi))
-    # return
-    X = max(mini,maxi)+1
-    
-    dp = [0]*(2*X)
-    dp[0] = 1
-    
-    if min(L)>0 or max(L)<0:
-        print(0)
-        return
+    fans = float('inf')
+    L = []
+    for i in range(n):
+        L.append(tuple(LII())[::-1])
 
-    for i in L:
-        if i<0:
-            for j in range(-X,X+i):
-                dp[j] += dp[j-i]
-                if dp[j]>MOD:
-                    dp[j] -= MOD
-        else:
-            for j in range(X,-X+i,-1):
-                dp[j] += dp[j-i]
-                if dp[j]>MOD:
-                    dp[j] -= MOD
+    L = sorted(L,key=lambda x:(x[0]*(1<<31)+x[1]))
     
-    print((dp[0]-1)%MOD)
+    def func(L):
+        nonlocal fans
+
+        # at most 6 points honge since distance less than d hain
+        # toh we can make two squares or d by d, one above and one below
+        # best case scenario, iske sare corners pe hoga point
+        # toh at max 6 point ho rahe
+        L.sort(key=lambda x:x[1])
+        for i in range(len(L)):
+            # 6 times max run hoga
+            for j in range(i+1,len(L)): 
+                if (L[j][1]-L[i][1])**2>=fans:
+                    break
+                fans = min(fans,(L[j][1]-L[i][1])**2+(abs(L[j][0]-L[i][0]))**2)
+        
+
+
+    
+    def rec(start,end):
+        nonlocal fans
+        
+        if (end-start)<=1:
+            if start==end:
+                return
+            fans = min(fans,(L[end][0]-L[start][0])**2+(L[end][1]-L[start][1])**2)
+            return
+        
+        mid = (start+end)//2
+        rec(start,mid)
+        rec(mid+1,end)
+        # f is the min possible distance between any two points independently 
+        # in the both halves
+        # ab inhe combine karna hain 
+ 
+        md = L[mid][0]
+        L1 = []
+ 
+        for i in range(start,end+1):
+            if (L[i][0]-md)*(L[i][0]-md)<fans:
+                L1.append(L[i])
+        
+        return func(L1)
+ 
+    rec(0,n-1)
+
+    print(fans)
  
     #L1 = LII()
     #st = SI()

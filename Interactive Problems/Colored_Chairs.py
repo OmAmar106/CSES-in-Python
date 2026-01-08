@@ -5,7 +5,7 @@ from collections import Counter,deque,defaultdict
 from itertools import permutations,combinations
 from io import BytesIO, IOBase
 from decimal import Decimal,getcontext
- 
+
 BUFSIZE = 8192
 class FastIO(IOBase):
     newlines = 0
@@ -45,7 +45,7 @@ class IOWrapper(IOBase):
         self.read = lambda: self.buffer.read().decode("ascii")
         self.readline = lambda: self.buffer.readline().decode("ascii")
 sys.stdin, sys.stdout = IOWrapper(sys.stdin), IOWrapper(sys.stdout)
- 
+
 # functions #
 # MOD = 998244353
 MOD = 10**9 + 7
@@ -67,7 +67,7 @@ LII_1 = lambda : list(map(lambda x:int(x)-1, sys.stdin.readline().split()))
 LII_C = lambda x : list(map(x, sys.stdin.readline().split()))
 MATI = lambda x : [list(map(int, sys.stdin.readline().split())) for _ in range(x)]
 ##
- 
+
 #String hashing: shclass, fenwick sortedlist: fsortl, Number: numtheory/numrare, SparseTable: SparseTable
 #Bucket Sorted list: bsortl, Segment Tree(lp,selfop): SegmentTree, bootstrap: bootstrap, Trie: tries
 #binary indexed tree: BIT, Segment Tree(point updates): SegmentPoint, Convex Hull: hull, BitArray: bitarray
@@ -75,46 +75,80 @@ MATI = lambda x : [list(map(int, sys.stdin.readline().split())) for _ in range(x
 #Persistent Segment Tree: perseg, Binary Trie: b_trie, HLD: hld, String funcs: sf, Segment Tree(lp): SegmentOther
 #Graph1(dnc,bl): graphadv, Graph2(khn,sat): 2sat, Graph3(fltn,bprt): graphflatten, Graph4(ep,tp,fw,bmf): graphoth
 #Graph5(djik,bfs,dfs): graph, Graph6(dfsin): dfsin, utils: utils, Persistent DSU: perdsu, Merge Sort Tree: sorttree
-#2-D BIT: 2DBIT, MonoDeque: mono, nummat: matrix, SuffixAutomaton: sautomaton
+#2-D BIT: 2DBIT, MonoDeque: mono, nummat: matrix, SuffixAutomaton: sautomaton, linalg: linalg, SquareRtDecomp: sqrt
+#Grapth7(bridges): graph_dmgt, FWHT(^,|,&): fwht
 #Template : https://github.com/OmAmar106/Template-for-Competetive-Programming
-# input_file = open(r'input.txt', 'r');sys.stdin = input_file
- 
-def solve():
-    n,k = LII()
-    L = LII_C(lambda x:int(x)-k)
- 
-    mini = 0
-    maxi = 0
-    for i in L:
-        if i<0:
-            mini -= i
-        else:
-            maxi += i
-    # print(max(mini,maxi))
-    # return
-    X = max(mini,maxi)+1
-    
-    dp = [0]*(2*X)
-    dp[0] = 1
-    
-    if min(L)>0 or max(L)<0:
-        print(0)
-        return
+#if os.environ.get('LOCAL'):sys.stdin = open(r'input.txt', 'r');sys.stdout = open(r'output.txt','w')
 
-    for i in L:
-        if i<0:
-            for j in range(-X,X+i):
-                dp[j] += dp[j-i]
-                if dp[j]>MOD:
-                    dp[j] -= MOD
+def extras():
+    getcontext().prec = 50
+    sys.setrecursionlimit(10**6)
+    sys.set_int_max_str_digits(10**5)
+# extras()
+
+def interactive():
+    import builtins
+    # print(globals())
+    globals()['print'] = lambda *args, **kwargs: builtins.print(*args, flush=True, **kwargs)
+interactive()
+
+def GI(n,m=None,sub=-1,dirs=False,weight=False):
+    if m==None:
+        m = n-1
+    d = [[] for i in range(n)]
+    if not weight:
+        for i in range(m):
+            u,v = LII_C(lambda x:int(x)+sub)
+            d[u].append(v)
+            if not dirs:
+                d[v].append(u)
+    else:
+        for i in range(m):
+            u,v,w = LII()
+            d[u+sub].append((v+sub,w))
+            if not dirs:
+                d[v+sub].append((u+sub,w))
+    return d
+
+ordalp = lambda s : ord(s)-65 if s.isupper() else ord(s)-97
+alp = lambda x : chr(97+x)
+yes = lambda : print("Yes")
+no = lambda : print("No")
+yn = lambda flag : print("Yes" if flag else "No")
+printf = lambda x : print(-1 if x==float('inf') else x)
+lalp = 'abcdefghijklmnopqrstuvwxyz'
+ualp = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+dirs = ((1,0),(0,1),(-1,0),(0,-1))
+dirs8 = ((1,0),(0,1),(-1,0),(0,-1),(1,-1),(-1,1),(1,1),(-1,-1))
+ldir = {'D':(1,0),'U':(-1,0),'R':(0,1),'L':(0,-1)}
+
+def query(k):
+    print('?',k)
+    return 1 if SI()=="R" else 0
+
+def solve():
+    n = II()
+
+    # it is from 0 to n
+    # i ask of 1
+    # then check the color of mid, if 1 then alternate is equal to mid, answer in mid+1 to n
+
+    k = query(1)
+
+    start = 2
+    end = n
+
+    while start<=end:
+        mid = (start+end)//2
+        if 1==mid%2 and query(mid)==k:
+            start = mid+1
+        elif 0==mid%2 and query(mid)!=k:
+            start = mid+1
         else:
-            for j in range(X,-X+i,-1):
-                dp[j] += dp[j-i]
-                if dp[j]>MOD:
-                    dp[j] -= MOD
+            end = mid-1
     
-    print((dp[0]-1)%MOD)
- 
+    print('!',start-1)
+
     #L1 = LII()
     #st = SI()
 solve()
