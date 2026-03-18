@@ -26,6 +26,8 @@ Welcome to my repository where I am solving all the **CSES Problem Set** problem
 I'll be updating this repo as soon as i complete more problems. There are a total of 400 problems.
 There might be some problems in which, you might need to use Python3 rather than PyPy.
 
+<img width="395" height="63" alt="300-on-CSES" src="https://github.com/user-attachments/assets/0545e707-de1d-4769-bc02-1ae2b608919c" />
+
 ## 🏅 Acknowledgements
 
 Thanks to the **CSES Problem Set** creators for providing such an amazing platform for competitive programming practice.
