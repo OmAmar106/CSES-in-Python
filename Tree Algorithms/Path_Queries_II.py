@@ -1,11 +1,6 @@
-import sys,math,cmath,random,os
-from heapq import heappush,heappop
-from bisect import bisect_right,bisect_left
-from collections import Counter,deque,defaultdict
-from itertools import permutations
+import sys,os
 from io import BytesIO, IOBase
-
-BUFSIZE = 8192
+BUFSIZE = (1<<13)
 class FastIO(IOBase):
     newlines = 0
     def __init__(self, file):
@@ -45,158 +40,112 @@ class IOWrapper(IOBase):
         self.readline = lambda: self.buffer.readline().decode("ascii")
 sys.stdin, sys.stdout = IOWrapper(sys.stdin), IOWrapper(sys.stdout)
 
-# functions #
-# MOD = 998244353
-MOD = 10**9 + 7
-RANDOM = random.randrange(1,2**62)
-def gcd(a,b):
-    if a%b==0:
-        return b
+n,q = (map(int, sys.stdin.readline().split()))
+d = [[] for i in range(n)]
+ 
+L = list(map(int, sys.stdin.readline().split()))
+for _ in range(n-1):
+    u,v = (map(int, sys.stdin.readline().split()))
+    d[u-1].append(v-1)
+    d[v-1].append(u-1)
+ 
+parent = [-1]*n
+depth = [0]*n
+size = depth[:]
+heavy = parent[:]
+pos = depth[:]
+stack = [(0, -1, 0)]
+while stack:
+    u, p, state = stack.pop()
+    if state == 0:
+        stack.append((u, p, 1))
+        du = depth[u]
+        for v in d[u]:
+            if v != p:
+                parent[v] = u
+                depth[v] = du + 1
+                stack.append((v, u, 0))
     else:
-        return gcd(b,a%b)
-def lcm(a,b):
-    return a//gcd(a,b)*b
-def w(x):
-    return x ^ RANDOM
-##
+        size[u] = 1
+        mx = 0
+        pu = parent[u]
+        for v in d[u]:
+            if v != pu:
+                sv = size[v]
+                size[u] += sv
+                if sv > mx:
+                    mx = sv
+                    heavy[u] = v
 
-#String hashing: sh/shclass, fenwick sortedlist: fsortl, Number: numtheory, SparseTable: SparseTable
-#Bucket Sorted list: bsortl, Segment Tree(lazy propogation): SegmentTree/Other, bootstrap: bootstrap
-#binary indexed tree: BIT, Segment Tree(point updates): SegmentPoint, Convex Hull: hull, Trie/Treap: Tries
-#Combinatorics: pnc, Diophantine Equations: dpheq, Graphs: graphs, DSU: DSU, Geometry: Geometry, FFT: fft
-#Persistent Segment Tree: perseg, FreqGraphs: bgraph, Binary Trie: b_trie, XOR_dict: xdict
-#Template : https://github.com/OmAmar106/Template-for-Competetive-Programming
-# input_file = open(r'input.txt', 'r');sys.stdin = input_file
+cur = 0
+stack = [0]
+while stack:
+    u = stack.pop()
+    h = u
+    while u != -1:
+        size[u] = h
+        pos[u] = cur+n
+        cur += 1
+        hu = heavy[u]
+        pu = parent[u]
+        for v in d[u]:
+            if v!=pu and v!=hu:
+                stack.append(v)
+        u = hu
 
-class SegmentTree:
-    @staticmethod
-    def func(a, b):
-        return max(a, b)
-    def __init__(self, data):
-        self.n = len(data)
-        self.tree = [0] * (2 * self.n)
-        self.build(data)
-    def build(self, data):
-        for i in range(self.n):
-            self.tree[self.n + i] = data[i]
-        for i in range(self.n - 1, 0, -1):
-            self.tree[i] = self.func(self.tree[i * 2], self.tree[i * 2 + 1])
-    def update(self, pos, value):
-        pos += self.n
-        self.tree[pos] = value
-        while pos > 1:
-            pos //= 2
-            self.tree[pos] = self.func(self.tree[2 * pos], self.tree[2 * pos + 1])
-    def query(self, left, right):
-        # Query the maximum value in the range [left, right)
-        left += self.n
-        right += self.n
-        # Change the initializer depending upon the self.func
-        max_val = float('-inf')
-        ##
-        while left < right:
-            if left % 2:
-                max_val = self.func(max_val, self.tree[left])
-                left += 1
-            if right % 2:
-                right -= 1
-                max_val = self.func(max_val, self.tree[right])
-            left //= 2
-            right //= 2
-        return max_val
-    def __repr__(self):
-        print('Seg[',end='')
-        for i in range(self.n):
-            if i!=self.n-1:
-                print(self.query(i,i+1),end=', ')
-            else:
-                print(self.query(i,i+1),end=']')
-        print()
+seg = [0] * (2 * n)
+for i in range(n):
+    seg[pos[i]] = L[i]
+for i in range(n - 1, 0, -1):
+    seg[i] = seg[2*i] if seg[2*i] > seg[2*i+1] else seg[2*i+1]
+ 
+def update(u, x):
+    u = pos[u]
+    seg[u] = x
+    u >>= 1
+    while u:
+        seg[u] = seg[u<<1] if seg[u<<1]>seg[(u<<1)+1] else seg[(u<<1)+1]
+        u >>= 1
 
-class HLD:
-    def __init__(self, adj, values, root=0):
-        self.n = len(adj)
-        self.adj = adj
-        self.values = values
-        self.root = root
-        self.parent = [-1] * self.n
-        self.depth = [0] * self.n
-        self.size = [0] * self.n
-        self.heavy = [-1] * self.n
-        self.head = [0] * self.n
-        self.pos = [0] * self.n
-        self.flat = [0] * self.n
-        self.time = 0
-        self._dfs(self.root)
-        self._decompose(self.root, self.root)
-        self.seg = SegmentTree([self.values[self.flat[i]] for i in range(self.n)])
-    def _dfs(self,start=0):
-        graph = self.adj
-        n = self.n
-        visited = [False] * n
-        stack = [start]
-        while stack:
-            start = stack[-1]
-            if not visited[start]:
-                visited[start] = True
-                for child in graph[start]:
-                    if not visited[child]:
-                        self.parent[child] = start
-                        self.depth[child] = self.depth[start]+1
-                        stack.append(child)
-            else:
-                stack.pop()
-                self.size[start] = 1
-                k = 0
-                for child in graph[start]:
-                    if self.parent[start]!=child:
-                        self.size[start] += self.size[child]
-                        if self.size[child]>k:
-                            k = self.size[child]
-                            self.heavy[start] = child
-        return visited
-    def _decompose(self, root, h):
-        stack = [(root, h)]
-        while stack:
-            u, h = stack.pop()
-            self.head[u] = h
-            self.flat[self.time] = u
-            self.pos[u] = self.time
-            self.time += 1
-            for v in reversed(self.adj[u]):
-                if v != self.parent[u] and v != self.heavy[u]:
-                    stack.append((v, v))
-            if self.heavy[u] != -1:
-                stack.append((self.heavy[u], h))
-    def query(self, u, v):
-        res = float('-inf') # update this depending upon the func
-        while self.head[u] != self.head[v]:
-            if self.depth[self.head[u]] < self.depth[self.head[v]]:
-                u, v = v, u
-            res = SegmentTree.func(res, self.seg.query(self.pos[self.head[u]], self.pos[u] + 1))
-            u = self.parent[self.head[u]]
-        if self.depth[u] > self.depth[v]:
+def query(u, v):
+    res = 0
+    while size[u]!=size[v]:
+        if depth[size[u]] < depth[size[v]]:
             u, v = v, u
-        res = SegmentTree.func(res, self.seg.query(self.pos[u], self.pos[v] + 1))
-        return res
-    def update(self, u, value):
-        self.seg.update(self.pos[u], value)
+        l = pos[size[u]]
+        r = pos[u]+1
+        while l < r:
+            if l & 1: 
+                if seg[l]>res:res = seg[l]
+                l += 1
+            if r & 1: 
+                if seg[r-1]>res:
+                    res = seg[r-1]
+            l >>= 1; r >>= 1
+        u = parent[size[u]]
+ 
+    if depth[u] > depth[v]:
+        u, v = v, u
+ 
+    l = pos[u]
+    r = pos[v]+1
+    while l < r:
+        if l & 1: 
+            if seg[l]>res:res = seg[l]
+            l += 1
+        if r & 1: 
+            if seg[r-1]>res:
+                res = seg[r-1]
+        l >>= 1; r >>= 1
+ 
+    return res
+ 
+ans = []
+for _ in range(q):
+    ty,s,x = (map(int, sys.stdin.readline().split()))
+    if ty==1:
+        update(s-1,x)
+    else:
+        ans.append(query(s-1,x-1))
 
-
-def solve():
-    n,q = list(map(int, sys.stdin.readline().split()))
-    L = list(map(int, sys.stdin.readline().split()))
-    d = [[] for i in range(n)]
-    for i in range(n-1):
-        u,v = list(map(lambda x:int(x)-1, sys.stdin.readline().split()))
-        d[u].append(v)
-        d[v].append(u)
-    hld = HLD(d,L)
-    for i in range(q):
-        t,s,x = list(map(lambda x:int(x)-1, sys.stdin.readline().split()))
-        if t==0:
-            hld.update(s,x+1)
-        else:
-            print(hld.query(s,x),end=' ')
-    #st = sys.stdin.readline().strip()
-solve()
+print(' '.join(map(str,ans)))
