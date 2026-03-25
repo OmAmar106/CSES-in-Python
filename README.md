@@ -12,14 +12,14 @@ Welcome to my repository where I am solving all the **CSES Problem Set** problem
 6. **Tree Algorithms** - 15/16
 7. **Mathematics** - 37/37 - ✅
 8. **String Algorithms** - 17/21
-9. **Geometry** - 10/16
+9. **Geometry** - 11/16
 10. **Advanced Techniques** - 19/25
 11. **Sliding Window Problems** - 10/11
 12. **Interactive Problems** - 6/6 - ✅
 13. **Bitwise Operations** - 6/11
 14. **Construction Problems** - 5/8
 15. **Advanced Graph Problems** - 17/28
-16. **Counting Problems** - 3/18
+16. **Counting Problems** - 4/18
 17. **Additional Problems I** - 15/30
 18. **Additional Problems II** - 9/30
 
