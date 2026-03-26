@@ -16,11 +16,11 @@ Welcome to my repository where I am solving all the **CSES Problem Set** problem
 10. **Advanced Techniques** - 19/25
 11. **Sliding Window Problems** - 10/11
 12. **Interactive Problems** - 6/6 - ✅
-13. **Bitwise Operations** - 6/11
+13. **Bitwise Operations** - 7/11
 14. **Construction Problems** - 5/8
 15. **Advanced Graph Problems** - 17/28
 16. **Counting Problems** - 4/18
-17. **Additional Problems I** - 15/30
+17. **Additional Problems I** - 16/30
 18. **Additional Problems II** - 9/30
 
 I'll be updating this repo as soon as i complete more problems. There are a total of 400 problems.
