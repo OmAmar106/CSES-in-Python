@@ -11,7 +11,7 @@ Welcome to my repository where I am solving all the **CSES Problem Set** problem
 5. **Range Queries** - 23/25
 6. **Tree Algorithms** - 15/16
 7. **Mathematics** - 37/37 - ✅
-8. **String Algorithms** - 17/21
+8. **String Algorithms** - 18/21
 9. **Geometry** - 11/16
 10. **Advanced Techniques** - 19/25
 11. **Sliding Window Problems** - 10/11
