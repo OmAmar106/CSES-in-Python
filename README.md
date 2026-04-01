@@ -21,7 +21,7 @@ Welcome to my repository where I am solving all the **CSES Problem Set** problem
 15. **Advanced Graph Problems** - 17/28
 16. **Counting Problems** - 4/18
 17. **Additional Problems I** - 17/30
-18. **Additional Problems II** - 9/30
+18. **Additional Problems II** - 10/30
 
 I'll be updating this repo as soon as i complete more problems. There are a total of 400 problems.
 There might be some problems in which, you might need to use Python3 rather than PyPy.
