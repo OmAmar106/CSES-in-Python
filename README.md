@@ -11,7 +11,7 @@ Welcome to my repository where I am solving all the **CSES Problem Set** problem
 5. **Range Queries** - 23/25
 6. **Tree Algorithms** - 15/16
 7. **Mathematics** - 37/37 - ✅
-8. **String Algorithms** - 18/21
+8. **String Algorithms** - 19/21
 9. **Geometry** - 12/16
 10. **Advanced Techniques** - 22/25
 11. **Sliding Window Problems** - 10/11
@@ -21,7 +21,7 @@ Welcome to my repository where I am solving all the **CSES Problem Set** problem
 15. **Advanced Graph Problems** - 17/28
 16. **Counting Problems** - 4/18
 17. **Additional Problems I** - 17/30
-18. **Additional Problems II** - 10/30
+18. **Additional Problems II** - 11/30
 
 I'll be updating this repo as soon as i complete more problems. There are a total of 400 problems.
 There might be some problems in which, you might need to use Python3 rather than PyPy.
