@@ -8,7 +8,7 @@ Welcome to my repository where I am solving all the **CSES Problem Set** problem
 2. **Sorting and Searching** - 35/35 - ✅
 3. **Dynamic Programming** - 23/23 - ✅
 4. **Graph Algorithms** - 34/36
-5. **Range Queries** - 23/25
+5. **Range Queries** - 25/25 - ✅
 6. **Tree Algorithms** - 15/16
 7. **Mathematics** - 37/37 - ✅
 8. **String Algorithms** - 19/21
