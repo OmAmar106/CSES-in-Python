@@ -12,7 +12,7 @@ Welcome to my repository where I am solving all the **CSES Problem Set** problem
 6. **Tree Algorithms** - 15/16
 7. **Mathematics** - 37/37 - ✅
 8. **String Algorithms** - 19/21
-9. **Geometry** - 14/16
+9. **Geometry** - 15/16
 10. **Advanced Techniques** - 22/25
 11. **Sliding Window Problems** - 10/11
 12. **Interactive Problems** - 6/6 - ✅
@@ -20,7 +20,7 @@ Welcome to my repository where I am solving all the **CSES Problem Set** problem
 14. **Construction Problems** - 5/8
 15. **Advanced Graph Problems** - 18/28
 16. **Counting Problems** - 6/18
-17. **Additional Problems I** - 20/30
+17. **Additional Problems I** - 21/30
 18. **Additional Problems II** - 14/30
 
 I'll be updating this repo as soon as i complete more problems. There are a total of 400 problems.
