@@ -18,10 +18,10 @@ Welcome to my repository where I am solving all the **CSES Problem Set** problem
 12. **Interactive Problems** - 6/6 - ✅
 13. **Bitwise Operations** - 8/11
 14. **Construction Problems** - 5/8
-15. **Advanced Graph Problems** - 18/28
+15. **Advanced Graph Problems** - 19/28
 16. **Counting Problems** - 6/18
 17. **Additional Problems I** - 22/30
-18. **Additional Problems II** - 15/30
+18. **Additional Problems II** - 17/30
 
 I'll be updating this repo as soon as i complete more problems. There are a total of 400 problems.
 There might be some problems in which, you might need to use Python3 rather than PyPy.
