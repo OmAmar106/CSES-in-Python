@@ -20,7 +20,7 @@ Welcome to my repository where I am solving all the **CSES Problem Set** problem
 14. **Construction Problems** - 5/8
 15. **Advanced Graph Problems** - 19/28
 16. **Counting Problems** - 7/18
-17. **Additional Problems I** - 23/30
+17. **Additional Problems I** - 24/30
 18. **Additional Problems II** - 17/30
 
 I'll be updating this repo as soon as i complete more problems. There are a total of 400 problems.
