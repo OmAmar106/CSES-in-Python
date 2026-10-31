@@ -7,7 +7,7 @@ Welcome to my repository where I am solving all the **CSES Problem Set** problem
 1. **Introductory Problems** - 24/24 - ✅
 2. **Sorting and Searching** - 35/35 - ✅
 3. **Dynamic Programming** - 23/23 - ✅
-4. **Graph Algorithms** - 34/36
+4. **Graph Algorithms** - 35/36
 5. **Range Queries** - 25/25 - ✅
 6. **Tree Algorithms** - 15/16
 7. **Mathematics** - 37/37 - ✅
@@ -18,7 +18,7 @@ Welcome to my repository where I am solving all the **CSES Problem Set** problem
 12. **Interactive Problems** - 6/6 - ✅
 13. **Bitwise Operations** - 8/11
 14. **Construction Problems** - 5/8
-15. **Advanced Graph Problems** - 19/28
+15. **Advanced Graph Problems** - 20/28
 16. **Counting Problems** - 7/18
 17. **Additional Problems I** - 24/30
 18. **Additional Problems II** - 17/30
