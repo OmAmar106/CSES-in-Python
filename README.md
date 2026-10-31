@@ -16,7 +16,7 @@ Welcome to my repository where I am solving all the **CSES Problem Set** problem
 10. **Advanced Techniques** - 25/25 - ✅
 11. **Sliding Window Problems** - 10/11
 12. **Interactive Problems** - 6/6 - ✅
-13. **Bitwise Operations** - 8/11
+13. **Bitwise Operations** - 9/11
 14. **Construction Problems** - 5/8
 15. **Advanced Graph Problems** - 21/28
 16. **Counting Problems** - 7/18
