@@ -19,7 +19,7 @@ Welcome to my repository where I am solving all the **CSES Problem Set** problem
 13. **Bitwise Operations** - 9/11
 14. **Construction Problems** - 5/8
 15. **Advanced Graph Problems** - 23/28
-16. **Counting Problems** - 7/18
+16. **Counting Problems** - 8/18
 17. **Additional Problems I** - 25/30
 18. **Additional Problems II** - 21/30
 
