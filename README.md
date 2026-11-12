@@ -14,7 +14,7 @@ Welcome to my repository where I am solving all the **CSES Problem Set** problem
 8. **String Algorithms** - 20/21
 9. **Geometry** - 15/16
 10. **Advanced Techniques** - 25/25 - ✅
-11. **Sliding Window Problems** - 10/11
+11. **Sliding Window Problems** - 11/11 - ✅
 12. **Interactive Problems** - 6/6 - ✅
 13. **Bitwise Operations** - 11/11 - ✅
 14. **Construction Problems** - 5/8
