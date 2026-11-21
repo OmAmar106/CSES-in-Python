@@ -18,7 +18,7 @@ Welcome to my repository where I am solving all the **CSES Problem Set** problem
 12. **Interactive Problems** - 6/6 - ✅
 13. **Bitwise Operations** - 11/11 - ✅
 14. **Construction Problems** - 6/8
-15. **Advanced Graph Problems** - 25/28
+15. **Advanced Graph Problems** - 26/28
 16. **Counting Problems** - 8/18
 17. **Additional Problems I** - 30/30 - ✅
 18. **Additional Problems II** - 23/30
